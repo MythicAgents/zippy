@@ -4,7 +4,7 @@
   <img alt="Zippy Logo" src="documentation-payload/zippy/zippy.svg" height="30%" width="30%">
 </p>
 
-Zippy is an agent that compiles into Linux, MacOS, and Windows executables. It's an "IT training tool" - not ransomware.
+Zippy is an agent that compiles into Linux, (MacOS, and Windows - at some point) executables. It's an "IT training tool" - not ransomware...and is currently a WIP.
 
 It leverages the [Godot](godotengine.org/) to cross compile for the supported operating systems. This Zippy instance supports Mythic 2.3 and will be updated as necessary. It does not support Mythic 2.2 and lower.
 
