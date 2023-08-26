@@ -17,13 +17,13 @@ func show():
 	# var window_size = OS.get_window_size()
 	# OS.set_window_position(screen_size*0.5 - window_size*0.5) # If not fullscreen
 
-	var screen_size = OS.get_screen_size(0)
+	var screen_size = DisplayServer.screen_get_size(0)
 
-	OS.set_window_position(Vector2(0,0))
+	get_window().set_position(Vector2(0,0))
 
-	OS.set_window_title("")
+	get_window().set_title("")
 	var _donotcare = OS.set_thread_name("")
-	OS.window_fullscreen = true
+	get_window().mode = Window.MODE_EXCLUSIVE_FULLSCREEN if (true) else Window.MODE_WINDOWED
 	#OS.window_size = screen_size
 
 	gui.position = screen_size*0.5 - display_size*0.75
@@ -33,10 +33,10 @@ func show():
 func hide():
 	gui.hide()
 	
-	OS.set_window_title("")
+	get_window().set_title("")
 	var _donotcare = OS.set_thread_name("")
-	OS.window_fullscreen = false
-	OS.window_size = Vector2(1,1)
+	get_window().mode = Window.MODE_EXCLUSIVE_FULLSCREEN if (false) else Window.MODE_WINDOWED
+	get_window().size = Vector2(1,1)
 	gui.position = Vector2(-1,-1)
 	gui.reset()
 
