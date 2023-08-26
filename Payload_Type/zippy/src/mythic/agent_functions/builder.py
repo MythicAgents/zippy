@@ -11,7 +11,7 @@ from mythic_container.MythicRPC import *
 
 class Zippy(PayloadType):
     name = "zippy"
-    file_extension = "exe"
+    file_extension = ""
     author = "@ArchiMoebius"
     supported_os = [
         SupportedOS.Windows,
@@ -26,8 +26,8 @@ class Zippy(PayloadType):
         BuildParameter(
             name="arch",
             parameter_type=BuildParameterType.ChooseOne,
-            choices=["x64", "x86"],
-            default_value="x64",
+            choices=["x86_64", "x86_32"],
+            default_value="x86_64",
             description="Target architecture",
         ),
         BuildParameter(
@@ -44,9 +44,9 @@ class Zippy(PayloadType):
         ),
     }
     c2_profiles = ["websocket"]
-    agent_path = pathlib.Path(".") / "zippy" / "mythic"
-    agent_code_path = pathlib.Path(".") / "zippy" / "agent_code"
-    agent_icon_path = agent_path / "agent_functions" / "zippy.svg"
+    agent_path = pathlib.Path(".") / "src" / "mythic"
+    agent_code_path = pathlib.Path(".") / "src" / "agent_code"
+    agent_icon_path = agent_path / "agent_functions" / "logo.svg"
     
     build_steps = [
         BuildStep(step_name="Gathering Files", step_description="Copying files to temp location"),
@@ -89,10 +89,6 @@ class Zippy(PayloadType):
 
                 outputType = self.get_parameter("arch").lower()
                 debug = self.get_parameter("debug")
-                defaultOutputType = "x86"
-
-                if outputType != defaultOutputType:
-                    outputType = f"{defaultOutputType}_{outputType.replace('x', '')}"
 
                 await SendMythicRPCPayloadUpdatebuildStep(MythicRPCPayloadUpdateBuildStepMessage(
                     PayloadUUID=self.uuid,
@@ -101,9 +97,9 @@ class Zippy(PayloadType):
                     StepSuccess=True
                 ))
 
-                debug = "--debug" if debug else ""
+                build_type = "--export-debug" if debug else "--export-release"
 
-                command = f"godot {debug} --quiet --export Zippy_{self.selected_os}_{outputType}"  # i.e. Linux_x86_64
+                command = f"godot {build_type} --verbose --headless --quiet zippy_{self.selected_os.lower()}_{outputType.lower()}"  # i.e. linux_x86_64 || linux_x86_32
 
                 proc = await asyncio.create_subprocess_shell(
                     command,
@@ -127,6 +123,7 @@ class Zippy(PayloadType):
                 ) as fh:
                     resp.payload = fh.read()
                     build_msg += f"Built: {agent_build_path}"
+
                 await SendMythicRPCPayloadUpdatebuildStep(MythicRPCPayloadUpdateBuildStepMessage(
                     PayloadUUID=self.uuid,
                     StepName="Compiling",
@@ -138,18 +135,18 @@ class Zippy(PayloadType):
             await SendMythicRPCPayloadUpdatebuildStep(MythicRPCPayloadUpdateBuildStepMessage(
                 PayloadUUID=self.uuid,
                 StepName="Compiling",
-                StepStdout=stdout_err,
+                StepStdout=f"Oh snap {e}\n{build_msg}",
                 StepSuccess=False
             ))
             resp.status = BuildStatus.Error
             resp.payload = b""
             resp.build_message = f"Unknown error while building payload. Check the stderr for this build. {e}"
-            resp.build_stderr = stdout_err
+            resp.build_stderr = build_msg
         finally:
             await SendMythicRPCPayloadUpdatebuildStep(MythicRPCPayloadUpdateBuildStepMessage(
                 PayloadUUID=self.uuid,
                 StepName="Praise",
-                StepStdout="Ah ha - we're done...did it work?",
+                StepStdout="Ah ha - we're done...did it work?\n{build_msg}",
                 StepSuccess=True
             ))
 
