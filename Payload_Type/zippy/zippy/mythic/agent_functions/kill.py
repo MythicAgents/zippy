@@ -1,5 +1,5 @@
-from mythic_payloadtype_container.MythicCommandBase import *
-from mythic_payloadtype_container.MythicRPC import *
+from mythic_container.MythicCommandBase import *
+from mythic_container.MythicRPC import *
 
 
 class KillArguments(TaskArguments):

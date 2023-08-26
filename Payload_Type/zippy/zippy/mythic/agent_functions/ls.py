@@ -1,5 +1,5 @@
-from mythic_payloadtype_container.MythicCommandBase import *
-from mythic_payloadtype_container.MythicRPC import *
+from mythic_container.MythicCommandBase import *
+from mythic_container.MythicRPC import *
 
 import json
 
@@ -45,7 +45,7 @@ class LsCommand(CommandBase):
     supported_ui_features = ["file_browser:list"]
     is_file_browse = True
     argument_class = LsArguments
-    browser_script = []
+    browser_script = BrowserScript(script_name="ls", author="@djhohnstein", for_new_ui=True)
     attributes = CommandAttributes(
         supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux],
     )

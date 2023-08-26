@@ -1,8 +1,8 @@
 import json
 import shlex
 
-from mythic_payloadtype_container.MythicCommandBase import *
-from mythic_payloadtype_container.MythicRPC import *
+from mythic_container.MythicCommandBase import *
+from mythic_container.MythicRPC import *
 
 
 class DownloadArguments(TaskArguments):
@@ -47,7 +47,7 @@ class DownloadCommand(CommandBase):
     parameters = []
     attackmapping = ["T1020", "T1030", "T1041"]
     argument_class = DownloadArguments
-    browser_script = []
+    browser_script = None
     attributes = CommandAttributes(
         supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux],
     )

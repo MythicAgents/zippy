@@ -1,5 +1,5 @@
-from mythic_payloadtype_container.MythicCommandBase import *
-from mythic_payloadtype_container.MythicRPC import *
+from mythic_container.PayloadBuilder import *
+from mythic_container.MythicCommandBase import *
 
 import json
 
@@ -43,7 +43,7 @@ class RmCommand(CommandBase):
     attackmapping = ["T1485"]
     supported_ui_features = ["file_browser:remove"]
     argument_class = RmArguments
-    browser_script = [BrowserScript(script_name="ls", author="@its_a_feature_")]
+    browser_script = BrowserScript(script_name="ls", author="@its_a_feature_")
     attributes = CommandAttributes(
         supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux],
     )

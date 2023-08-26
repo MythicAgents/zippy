@@ -1,29 +1,32 @@
-from mythic_payloadtype_container.MythicCommandBase import *
+from mythic_container.MythicCommandBase import *
+import json
 
 
-class RansomArguments(TaskArguments):
+class ExitArguments(TaskArguments):
     def __init__(self, command_line, **kwargs):
         super().__init__(command_line, **kwargs)
         self.args = []
 
     async def parse_arguments(self):
+
         if len(self.command_line) > 0:
-            raise Exception("Ransom command takes no parameters.")
+            raise Exception("exit command takes no parameters.")
 
 
-class RansomCommand(CommandBase):
-    cmd = "ransom"
+class ExitCommand(CommandBase):
+    cmd = "exit"
     needs_admin = False
-    help_cmd = "ransom"
-    description = "Task the implant to show the Ransom screen"
+    help_cmd = "exit"
+    description = "Task the agent to exit"
     version = 2
+    supported_ui_features = ["callback_table:exit"]
     is_file_browse = False
     is_process_list = False
     is_download_file = False
     is_upload_file = False
     is_remove_file = False
     author = "@ArchiMoebius"
-    argument_class = RansomArguments
+    argument_class = ExitArguments
     attackmapping = []
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

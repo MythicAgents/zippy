@@ -1,5 +1,5 @@
-from mythic_payloadtype_container.MythicCommandBase import *
-from mythic_payloadtype_container.MythicRPC import *
+from mythic_container.MythicCommandBase import *
+from mythic_container.MythicRPC import *
 
 
 class PsArguments(TaskArguments):
@@ -21,7 +21,7 @@ class PsCommand(CommandBase):
     attackmapping = ["T1106"]
     supported_ui_features = ["process_browser:list"]
     argument_class = PsArguments
-    browser_script = []
+    browser_script = None
     attributes = CommandAttributes(
         supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux],
     )

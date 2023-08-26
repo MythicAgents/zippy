@@ -3,6 +3,7 @@
 .import/
 export.cfg
 export_presets.cfg
+Payload_Type/zippy/zippy/agent_code/.godot
 
 # Mono-specific ignores
 .mono/

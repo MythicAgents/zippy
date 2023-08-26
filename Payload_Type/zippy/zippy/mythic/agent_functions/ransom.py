@@ -1,36 +1,30 @@
-from mythic_payloadtype_container.MythicCommandBase import *
-import json
+from mythic_container.MythicCommandBase import *
 
 
-class WhoamiArguments(TaskArguments):
+class RansomArguments(TaskArguments):
     def __init__(self, command_line, **kwargs):
         super().__init__(command_line, **kwargs)
         self.args = []
 
     async def parse_arguments(self):
         if len(self.command_line) > 0:
-            raise Exception("whoami takes no command line arguments.")
-        pass
+            raise Exception("Ransom command takes no parameters.")
 
 
-class WhoamiCommand(CommandBase):
-    cmd = "whoami"
+class RansomCommand(CommandBase):
+    cmd = "ransom"
     needs_admin = False
-    help_cmd = "whoami"
-    description = "Get the username associated with your current thread token."
+    help_cmd = "ransom"
+    description = "Task the implant to show the Ransom screen"
     version = 2
-    is_exit = False
     is_file_browse = False
     is_process_list = False
     is_download_file = False
     is_upload_file = False
     is_remove_file = False
     author = "@ArchiMoebius"
-    argument_class = WhoamiArguments
-    attackmapping = ["T1033"]
-    attributes = CommandAttributes(
-        supported_os=[SupportedOS.MacOS, SupportedOS.Linux],
-    )
+    argument_class = RansomArguments
+    attackmapping = []
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         return task
