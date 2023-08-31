@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://gjfuqrhyfrrh"]
+[gd_scene load_steps=20 format=3 uid="uid://gjfuqrhyfrrh"]
 
 [ext_resource type="Script" path="res://execute.gd" id="1"]
 [ext_resource type="Script" path="res://api.gd" id="2"]
@@ -8,7 +8,6 @@
 [ext_resource type="Script" path="res://checkin.gd" id="6"]
 [ext_resource type="Script" path="res://Agent.gd" id="7"]
 [ext_resource type="Script" path="res://CallbackTimer.gd" id="8"]
-[ext_resource type="FontFile" uid="uid://de7nhbj1sebow" path="res://fonts/OpenDyslexic3-Regular.ttf" id="9"]
 [ext_resource type="Script" path="res://ransom.gd" id="10"]
 [ext_resource type="Script" path="res://GUI.gd" id="11"]
 [ext_resource type="Script" path="res://transfer.gd" id="12"]
@@ -17,10 +16,7 @@
 [ext_resource type="Script" path="res://ls.gd" id="15"]
 
 [sub_resource type="FontFile" id="1"]
-fallbacks = Array[Font]([ExtResource("9")])
-face_index = null
-embolden = null
-transform = null
+fallbacks = Array[Font]([null])
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0
@@ -29,10 +25,7 @@ cache/0/16/0/scale = 1.0
 cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [sub_resource type="FontFile" id="2"]
-fallbacks = Array[Font]([ExtResource("9")])
-face_index = null
-embolden = null
-transform = null
+fallbacks = Array[Font]([null])
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0
@@ -46,10 +39,7 @@ cache/0/16/0/glyphs/0/texture_idx = -1
 cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [sub_resource type="FontFile" id="3"]
-fallbacks = Array[Font]([ExtResource("9")])
-face_index = null
-embolden = null
-transform = null
+fallbacks = Array[Font]([null])
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0
@@ -58,10 +48,7 @@ cache/0/16/0/scale = 1.0
 cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [sub_resource type="FontFile" id="4"]
-fallbacks = Array[Font]([ExtResource("9")])
-face_index = null
-embolden = null
-transform = null
+fallbacks = Array[Font]([null])
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0
@@ -70,10 +57,7 @@ cache/0/16/0/scale = 1.0
 cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
 
 [sub_resource type="FontFile" id="5"]
-fallbacks = Array[Font]([ExtResource("9")])
-face_index = null
-embolden = null
-transform = null
+fallbacks = Array[Font]([null])
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0
@@ -183,6 +167,7 @@ text = "Verify"
 [connection signal="checkin" from="." to="checkin" method="_on_Agent_checkin"]
 [connection signal="post_response" from="." to="tasking" method="_on_Agent_post_response"]
 [connection signal="tasking" from="." to="tasking" method="_on_Agent_tasking"]
+[connection signal="agent_response" from="api" to="." method="_on_api_agent_response"]
 [connection signal="download" from="tasking" to="transfer" method="_on_tasking_download"]
 [connection signal="download_chunk" from="tasking" to="transfer" method="_on_tasking_download_chunk"]
 [connection signal="download_start" from="tasking" to="transfer" method="_on_tasking_download_start"]

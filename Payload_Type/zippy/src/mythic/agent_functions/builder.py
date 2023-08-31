@@ -43,7 +43,7 @@ class Zippy(PayloadType):
             description="Enable TLS certificate verification",
         ),
     }
-    c2_profiles = ["websocket"]
+    c2_profiles = ["zippy-websocket"]
     agent_path = pathlib.Path(".") / "src" / "mythic"
     agent_code_path = pathlib.Path(".") / "src" / "agent_code"
     agent_icon_path = agent_path / "agent_functions" / "logo.svg"

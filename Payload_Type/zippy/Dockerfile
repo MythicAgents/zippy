@@ -1,4 +1,4 @@
-FROM itsafeaturemythic/mythic_python_base:latest
+FROM itsafeaturemythic/mythic_python_go:latest
 
 # Most from https://github.com/abarichello/godot-ci/blob/master/Dockerfile
 
@@ -20,14 +20,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rsync \
     && rm -rf /var/lib/apt/lists/*
 
-ARG GODOT_VERSION="4.0.2"
+ARG GODOT_VERSION="4.1.1"
 ARG RELEASE_NAME="stable"
 ARG SUBDIR=""
 ARG GODOT_TEST_ARGS=""
 ARG GODOT_PLATFORM="linux.x86_64"
 
-RUN wget https://downloads.tuxfamily.org/godotengine/${GODOT_VERSION}${SUBDIR}/Godot_v${GODOT_VERSION}-${RELEASE_NAME}_${GODOT_PLATFORM}.zip \
-    && wget https://downloads.tuxfamily.org/godotengine/${GODOT_VERSION}${SUBDIR}/Godot_v${GODOT_VERSION}-${RELEASE_NAME}_export_templates.tpz
+RUN wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-${RELEASE_NAME}/Godot_v${GODOT_VERSION}-${RELEASE_NAME}_${GODOT_PLATFORM}.zip \
+    && wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-${RELEASE_NAME}_export_templates.tpz
 
 # Download and setup android-sdk
 ENV ANDROID_HOME="/usr/lib/android-sdk"
@@ -63,6 +63,10 @@ RUN echo 'export/android/debug_keystore_pass = "android"' >> ~/.config/godot/edi
 RUN echo 'export/android/force_system_user = false' >> ~/.config/godot/editor_settings-4.tres
 RUN echo 'export/android/timestamping_authority_url = ""' >> ~/.config/godot/editor_settings-4.tres
 RUN echo 'export/android/shutdown_adb_on_exit = true' >> ~/.config/godot/editor_settings-4.tres
+
+RUN mkdir /c2_code
+COPY src/c2_code/ /c2_code/
+RUN make -C /c2_code/src
 
 WORKDIR /Mythic/
 

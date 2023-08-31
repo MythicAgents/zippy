@@ -6,7 +6,7 @@ enum DIRECTION {UPLOAD, DOWNLOAD}
 enum STATUS {BEGIN, TRANSFER, COMPLETE, ERROR}
 
 @export var state: STATUS = STATUS.BEGIN
-
+const FileTransfer = preload("res://file_transfer.gd")
 var api
 var task_id
 var file_id
@@ -18,6 +18,7 @@ var chunk_size = 512000 # bytes per response payload
 var chunk_count = 0
 var chunk_num = 1
 var next_chunk_please = false
+var user_output = ""
 
 var completed = false
 var file_id_requested = false
@@ -27,9 +28,9 @@ var checkin_done = false
 func debug():
 	print("TaskID: %s\nFileId: %s\nFilePath: %s\n" % [task_id, file_id, file_path])
 
-func _init(taskId, filePath, fileDirection, fileAPI, fileId = ""):
+func _init(taskId, filePath:String, fileDirection, fileAPI, fileId = ""):
 	task_id = taskId
-	file_path = filePath
+	file_path = filePath.simplify_path()
 	direction = fileDirection
 	api = fileAPI
 	file_id = fileId
@@ -68,7 +69,7 @@ func process_upload():
 		else:
 			state = STATUS.ERROR
 
-		api.agent_response(
+		api.send_agent_response(
 			api.create_task_response(
 				status,
 				completed,
@@ -118,7 +119,7 @@ func process_upload_chunk(response):
 					)
 				]
 
-			api.agent_response(
+			api.send_agent_response(
 				api.create_task_response(
 					true,
 					completed,
@@ -152,37 +153,33 @@ func process_download():
 		if file_handle.is_open():
 			file_path = file_handle.get_path_absolute()
 			file_size = file_handle.get_length()
-			chunk_count = int(file_size / chunk_size) + 1 # one based chunk counting...   \-:
+			
+			# one based chunk counting...   \-:
+			var extra = 0
+			
+			if file_size % chunk_size > 0:
+				extra = 1
+			chunk_count = int(file_size / chunk_size) + extra
 			user_output = "File size: %d\nFullpath: %s" % [file_size, file_path]
 
-			status = "success"
-			completed = false
 			state = STATUS.BEGIN
 		else:
 			state = STATUS.ERROR
 			user_output = "Error code: %d\nFile: %s" % [file_handle.get_error(), file_path]
 
-		api.agent_response(
-			api.create_task_response(
-				true,
-				completed,
-				task_id,
-				"",
-				[],
-				[],
-				[
-					api.create_file_response(
-						task_id,
-						file_path,
-						"",
-						false,
-						chunk_count,
-						chunk_size,
-						user_output,
-						status
-					)
-				]
-			)
+		api.send_agent_response(
+			JSON.stringify({
+				"action": "post_response", 
+				"responses": [{
+					"task_id": task_id,
+					"user_output": user_output,
+					"download": {
+						"total_chunks": chunk_count,
+						"full_path": file_path,
+						"chunk_size": chunk_size
+					}
+				}]
+			})
 		)
 
 	if next_chunk_please:
@@ -208,27 +205,43 @@ func process_download():
 			if position + chunk_size > file_size:
 				next_chunk_size = file_size - position
 
-			api.agent_response(
-				api.create_task_response(
-					true,
-					completed,
-					task_id,
-					"",
-					[],
-					[],
-					[
-						api.create_file_response_chunk(
-							task_id,
-							file_id,
-							chunk_num,
-							file_handle.get_buffer(next_chunk_size)
-						)
-					]
+			api.send_agent_response(
+				JSON.stringify(
+					{
+						"action": "post_response",
+						"responses": [{
+								"task_id": task_id,
+								"download": {
+									"chunk_num": chunk_num,
+									"file_id": file_id,
+									"chunk_data": Marshalls.raw_to_base64(file_handle.get_buffer(next_chunk_size)),
+								}
+							}
+						]
+					}
 				)
 			)
-		else:
-			file_handle.close()
-			state = STATUS.COMPLETE
+
+func process_file_complete():
+	file_handle.close()
+	state = STATUS.COMPLETE
+	
+	api.send_agent_response(
+		JSON.stringify(
+			{
+				"action": "post_response",
+				"responses": [{
+						"task_id": task_id,
+						"status": "success",
+						"completed": true,
+						"download": {
+							"file_id": file_id,
+						}
+					}
+				]
+			}
+		)
+	)
 
 func process_download_chunk(fileId):
 

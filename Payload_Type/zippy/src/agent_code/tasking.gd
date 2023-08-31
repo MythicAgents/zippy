@@ -37,7 +37,7 @@ func _on_CallbackTimer_timeout():
 	cbt.do_callback = true
 
 	if api.checkin_done:
-		api.agent_response(api.get_tasking_payload())
+		api.send_agent_response(api.get_tasking_payload())
 
 func _on_Agent_tasking(data):
 

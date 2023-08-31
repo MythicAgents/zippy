@@ -1,5 +1,6 @@
 extends Node
 
+var has_sent_checkin = false
 var time = 0
 var time_period = 1
 var do_exit = false
@@ -40,8 +41,10 @@ func _ready():
 	_client_options = TLSOptions.client_unsafe()
 
 	$CallbackTimer.wait_time = $config.get_callback_wait_time()
-	
-	print("$CallbackTimer.wait_time: ", $CallbackTimer.wait_time)
+
+func _on_server_close (code, reason):
+	print("_on_server_close ", code, " " , reason)
+	exiting = true
 
 func _error():
 	print("websocket error...")
@@ -50,8 +53,15 @@ func _error():
 func _closed(was_clean = false):
 	print("Closed, clean: ", was_clean)
 	exiting = true
+	has_sent_checkin = false
 
-func _connected(_proto = ""):
+func _connected():
+
+	if has_sent_checkin:
+		return
+
+	has_sent_checkin = true
+
 	print("Connected!")
 	connect_attempt = MAX_CONNECT_ATTEMPT
 
@@ -97,8 +107,10 @@ func _process(delta):
 		var status = _client.get_ready_state()
 
 		if status == WebSocketPeer.STATE_CLOSED:
-			print("client closed %d --- %s\n" % [_client.get_close_code(), _client.get_close_reason()])
-			
+
+			if _client != null:
+				print("client closed %d --- %s\n" % [_client.get_close_code(), _client.get_close_reason()])
+
 			if connect_attempt <= 0:
 				close_and_quit()
 			else:
@@ -112,10 +124,12 @@ func _process(delta):
 					print("connected?")
 
 		elif status == WebSocketPeer.STATE_OPEN:
+			_connected()
+			
+			if _client.get_available_packet_count() > 0:
+				_on_data()
 
 			if $api.get("checkin_done") and not exiting:
-				print("outbound size: %d in %d seconds" % [outbound.size(), $CallbackTimer.wait_time])
-
 				time = 0
 
 				if ($CallbackTimer.do_callback and outbound.size() > 0) or do_exit:
@@ -124,14 +138,11 @@ func _process(delta):
 					# TODO: flush outbound, slow emit, or only one at a time?
 					while outbound.size() > 0:
 						var msg = outbound.pop_front()
-						print("outbound size: %d in" % outbound.size())
 
 						var ret = _client.put_packet(msg)
 
 						if ret != OK:
 							print("failed to send data...", msg)
-						else:
-							print("\ndata sent\n")
 
 			if do_exit and outbound.size() <= 0:
 
@@ -155,7 +166,7 @@ func _on_api_agent_response(payload):
 func _on_tasking_exit(task):
 	do_exit = true
 
-	$api.agent_response(
+	$api.send_agent_response(
 		$api.create_task_response(
 			true,
 			true,
