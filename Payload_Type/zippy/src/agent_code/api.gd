@@ -51,7 +51,7 @@ func get_checkin_payload():
 	if OS.has_environment("HOSTNAME"):
 		hostname = OS.get_environment("HOSTNAME")
 
-	var os = "%s (%s) - %s" % [OS.get_name(), OS.get_model_name(), OS.get_version()]
+	var os = "%s (%s) - %s [%s] - %s" % [OS.get_name(), OS.get_model_name(), OS.get_version(), OS.get_distribution_name(), DisplayServer.get_name()]
 	if OS.has_environment("OS"):
 		os = OS.get_environment("OS")
 	else:
@@ -85,6 +85,7 @@ func get_checkin_payload():
 		"action": "checkin", # requiredupnp.queryexternaladdress(), #",".join(IP.get_local_addresses()), # internal ip address - required
 		"ip": ip,
 		"os": os, # os version - required
+		"process_name":  OS.get_unique_id(),
 		"user": username, # username of current user - required
 		"host": hostname, # hostname of the computer - required
 		"pid": OS.get_process_id(), # pid of the current process - required

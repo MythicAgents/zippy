@@ -20,11 +20,14 @@ boot_splash/use_filter=false
 [display]
 
 window/size/viewport_height=768
+window/size/mode=4
+window/size/initial_position_type=3
 window/size/resizable=false
 window/size/borderless=true
 window/size/always_on_top=true
-window/energy_saving/keep_screen_on=false
-window/stretch/mode="2d"
+window/size/transparent=true
+window/size/extend_to_title=true
+window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 window/per_pixel_transparency/allowed=true
 window/per_pixel_transparency/enabled=true

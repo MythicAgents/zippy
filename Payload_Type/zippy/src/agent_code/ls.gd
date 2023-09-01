@@ -23,7 +23,7 @@ func _on_tasking_ls(task):
 		var ret = []
 		
 		var dir = DirAccess.open(path)
-		
+		# TODO: ls w/o params should look at cwd?
 		if dir:
 			is_file = false
 			success = true
