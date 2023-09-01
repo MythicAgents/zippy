@@ -39,6 +39,7 @@ func _ready():
 	
 	_client = WebSocketPeer.new()
 	_client_options = TLSOptions.client_unsafe()
+	_client.set_handshake_headers($config.get_headers())
 
 	$CallbackTimer.wait_time = $config.get_callback_wait_time()
 

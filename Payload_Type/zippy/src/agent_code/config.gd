@@ -9,6 +9,8 @@ var setting = {
 
 var rng
 
+@export var sleep_time:int = 0
+
 func _ready():
 	rng = RandomNumberGenerator.new()
 	rng.randomize()
@@ -74,10 +76,11 @@ func get_callback_wait_time():
 	
 	if wait_time <= 0:
 		wait_time = 1
-	
-	wait_time = 4 # TODO: REMOVE AFTER DEBUG
 
-	return wait_time
+	print("\n\nget_callback_wait_time: %d" %[wait_time])
+	wait_time = 2
+
+	return wait_time + sleep_time
 
 func get_headers():
 	var headers = PackedStringArray()

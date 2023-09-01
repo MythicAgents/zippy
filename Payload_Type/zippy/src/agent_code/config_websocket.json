@@ -12,6 +12,6 @@
   "ENDPOINT_REPLACE": "socket",
   "callback_jitter": "3",
   "callback_port": "8081",
-  "payload_uuid": "806cf325-6f7c-44fa-b908-d3857441ea33",
+  "payload_uuid": "d49e306e-0faf-4a9f-8738-f81d46c10f47",
   "tls_verify": false
 }

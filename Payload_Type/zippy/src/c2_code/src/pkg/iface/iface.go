@@ -189,12 +189,14 @@ func (s *TransportConfig) PostMythicMessage(apiEndpoint string, sendData []byte)
 		return make([]byte, 0)
 	}
 
-	data, err := base64.StdEncoding.DecodeString(string(body))
-	if err != nil {
-		log.Fatal("error:", err)
-	}
+	if s.Debug {
+		data, err := base64.StdEncoding.DecodeString(string(body))
+		if err != nil {
+			log.Fatal("error:", err)
+		}
 
-	logger.Log(fmt.Sprintf("[I] Response body: %q", data))
+		logger.Log(fmt.Sprintf("[I] Response body: %q", data))
+	}
 
 	return body
 }

