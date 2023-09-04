@@ -14,13 +14,13 @@ class Zippy(PayloadType):
     file_extension = ""
     author = "@ArchiMoebius"
     supported_os = [
-        SupportedOS.Windows,
         SupportedOS.Linux,
+        SupportedOS.Windows,
     ]
-    version = "4.0.0"
+    version = "4.1.0"
     wrapper = False
     wrapped_payloads = []
-    note = """Currently - only Linux support - and not on a headless display - requires opengl!"""
+    note = """No headless display support - requires opengl!"""
     supports_dynamic_loading = False  # setting this to True allows users to only select a subset of commands when generating a payload
     build_parameters = {
         BuildParameter(
@@ -70,13 +70,12 @@ class Zippy(PayloadType):
 
                     try:
                         profile = c2.get_c2profile()
+                        
 
                         with open(
                             f"{agent_build_path}/config_{profile.get('name', '')}.json",
                             "w",
                         ) as fh:
-                            c2_config = c2.get_parameters_dict()
-
                             c2_config["payload_uuid"] = self.uuid
                             c2_config["tls_verify"] = self.get_parameter("tls_verify")
 

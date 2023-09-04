@@ -8,7 +8,7 @@ enum STATUS {BEGIN, TRANSFER, COMPLETE, ERROR}
 @export var state: STATUS = STATUS.BEGIN
 const FileTransfer = preload("res://file_transfer.gd")
 var is_screenshot = false
-var api
+var transport
 var task_id
 var file_id
 var file_path
@@ -29,7 +29,7 @@ var checkin_done = false
 func debug():
 	print("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nTaskID: %s\nFileId: %s\nFilePath: %s\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" % [task_id, file_id, file_path])
 
-func _init(taskId, filePath, fileDirection, fileAPI, fileId = "", rawData:PackedByteArray=[], isFromScreenshot=false):
+func _init(taskId, filePath, fileDirection, Transport, fileId = "", rawData:PackedByteArray=[], isFromScreenshot=false):
 	task_id = taskId
 
 	if isFromScreenshot:
@@ -40,7 +40,7 @@ func _init(taskId, filePath, fileDirection, fileAPI, fileId = "", rawData:Packed
 		file_path = filePath.simplify_path()
 
 	direction = fileDirection
-	api = fileAPI
+	transport = Transport
 	file_id = fileId
 
 	#only if we're doing random data upload (recording, http)
@@ -80,7 +80,7 @@ func process_upload():
 		else:
 			state = STATUS.ERROR
 
-		api.send_agent_response(
+		transport.send(
 			JSON.stringify({
 				"action": "post_response",
 				"responses": [{
@@ -112,7 +112,7 @@ func process_upload_chunk(response):
 				state = STATUS.COMPLETE
 				return
 
-			api.send_agent_response(
+			transport.send(
 				JSON.stringify({
 					"action": "post_response",
 					"responses": [{
@@ -173,7 +173,7 @@ func process_download():
 			else:
 				user_output = "Error zero byte file...\nFile: %s\n" % [file_path]
 
-		api.send_agent_response(
+		transport.send(
 			JSON.stringify({
 				"action": "post_response", 
 				"responses": [{
@@ -221,7 +221,7 @@ func process_download():
 				chunk = PackedByteArray(raw_data.slice(position, position+next_chunk_size))
 				position = position + next_chunk_size
 
-			api.send_agent_response(
+			transport.send(
 				JSON.stringify(
 					{
 						"action": "post_response",
@@ -251,7 +251,7 @@ func process_file_complete():
 	state = STATUS.COMPLETE
 
 	if direction == DIRECTION.DOWNLOAD or direction == DIRECTION.SCREENSHOT:
-		api.send_agent_response(
+		transport.send(
 			JSON.stringify(
 				{
 					"action": "post_response",
@@ -271,7 +271,7 @@ func process_file_complete():
 		)
 
 	if direction == DIRECTION.UPLOAD:	
-		api.send_agent_response(
+		transport.send(
 			JSON.stringify(
 				{
 					"action": "post_response",

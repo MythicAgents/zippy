@@ -1,5 +1,5 @@
 {
-  "callback_host": "ws://localhost",
+  "callback_host": "ws://10.10.10.69",
   "USER_AGENT": "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko",
   "AESPSK": {
 	"value": "none",

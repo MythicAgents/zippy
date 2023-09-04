@@ -14,13 +14,17 @@ config/name="zippy"
 run/main_scene="res://Agent.tscn"
 config/features=PackedStringArray("4.1")
 run/delta_smoothing=false
-boot_splash/fullsize=false
+boot_splash/show_image=false
 boot_splash/use_filter=false
+
+[audio]
+
+driver/enable_input=true
 
 [display]
 
 window/size/viewport_height=768
-window/size/mode=4
+window/size/mode=1
 window/size/initial_position_type=3
 window/size/resizable=false
 window/size/borderless=true

