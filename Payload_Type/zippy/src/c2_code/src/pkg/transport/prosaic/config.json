@@ -7,7 +7,7 @@
     "server_verify_tls": false,
     "server_generate_pki": false,
     "server_host": "0.0.0.0",
-    "server_port": 8081,
+    "server_port": 9091,
     "domain_name": "localhost",
     "websocket_filename": "socket",
     "http_filename": "index.html",

@@ -2,13 +2,10 @@
 
 This project supports the Mythic websocket C2Profile.
 
-Currently, there are two 'transports' which can be found at ./pkt/transport/:
+Currently, there is a single 'transport' which can be found at ./pkt/transport/:
 
 1) prosaic (default)
     - Assumes message follow the C2 Profile structure
-
-2) poseidon
-    - Wraps messages in a custom structure as seen in ./pkg/transport/poseidon/model/blob.go
 
 There is a config.json under each of the transports which contains the JSON required to create a transport of the type desired.
 

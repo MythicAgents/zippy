@@ -40,7 +40,12 @@ class ScreenshotCommand(CommandBase):
             f'of monitor: {str(task.args.get_arg("index"))}'
         )
 
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="Godot Screenshot API invoked native call",
+            artifact_type="API Called",
+        )
         return task
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

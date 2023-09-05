@@ -3,7 +3,6 @@ package iface
 import (
 	"ArchiMoebius/mythic_c2_websocket/pkg/logger"
 	"ArchiMoebius/mythic_c2_websocket/pkg/transport/common"
-	"ArchiMoebius/mythic_c2_websocket/pkg/transport/poseidon"
 	"ArchiMoebius/mythic_c2_websocket/pkg/transport/prosaic"
 	"bytes"
 	"context"
@@ -46,8 +45,6 @@ func (b *TransportConfig) UnmarshalJSON(data []byte) error {
 	switch tmpHeader.Type {
 	case "default":
 		b.Transport = new(prosaic.Transport)
-	case "poseidon":
-		b.Transport = new(poseidon.Transport)
 	}
 
 	if err := json.Unmarshal(data, b.Transport); err != nil {

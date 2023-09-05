@@ -38,7 +38,7 @@ func _setup_client():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	_time += delta
-
+	# TODO: this is not being called until we add_child in transport...duh...
 	if _time > _heartbeat_period:
 
 		if _client == null:
@@ -64,6 +64,8 @@ func send(payload, skip_queue=false):
 
 			if not ret:
 				print("failed to send data...", payload)
+			else:
+				print("sent payload: ", payload)
 		else:
 			print("skipping", payload, "try again once we're connected...")
 			ret = false
@@ -173,7 +175,6 @@ func client_is_connected():
 		print("client closed")
 		return -1
 	elif status == WebSocketPeer.STATE_OPEN:
-		print("client connected/ing")
 		return 1
 	else:
 		print("client in unknown state", status)

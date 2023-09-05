@@ -43,44 +43,33 @@ class UploadCommand(CommandBase):
         supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux],
     )
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
         try:
-            file_resp = await MythicRPC().execute(
-                "get_file",
-                task_id=task.id,
-                file_id=task.args.get_arg("file"),
-                get_contents=False,
-            )
-
-            if file_resp.status == MythicRPCStatus.Success:
-                original_file_name = file_resp.response[0]["filename"]
-
-                if len(task.args.get_arg("remote_path")) == 0:
-                    task.args.add_arg("remote_path", original_file_name)
-                elif task.args.get_arg("remote_path")[-1] == "/":
-                    task.args.add_arg(
-                        "remote_path",
-                        task.args.get_arg("remote_path") + original_file_name,
-                    )
-                    # task.args.add_arg("file", file_resp.response["agent_file_id"])
-                task.display_params = (
-                    f"{original_file_name} to {task.args.get_arg('remote_path')}"
-                )
+            file_resp = await SendMythicRPCFileSearch(MythicRPCFileSearchMessage(
+                TaskID=taskData.Task.ID,
+                AgentFileID=taskData.args.get_arg("file")
+            ))
+            if file_resp.Success:
+                if len(file_resp.Files) > 0:
+                    original_file_name = file_resp.Files[0].Filename
+                    if len(taskData.args.get_arg("remote_path")) == 0:
+                        taskData.args.add_arg("remote_path", original_file_name)
+                    elif taskData.args.get_arg("remote_path")[-1] == "/":
+                        taskData.args.add_arg("remote_path", taskData.args.get_arg("remote_path") + original_file_name)
+                    response.DisplayParams = f"{original_file_name} to {taskData.args.get_arg('remote_path')}"
+                else:
+                    raise Exception("Failed to find that file")
             else:
-                raise Exception("Error from Mythic RPC: " + str(file_resp.error))
-
-            file_resp = await MythicRPC().execute(
-                "update_file",
-                file_id=task.args.get_arg("file"),
-                delete_after_fetch=True,
-                comment="Uploaded to disk for upload",
-            )
-
+                raise Exception("Error from Mythic trying to get file: " + str(file_resp.Error))            
         except Exception as e:
-            raise Exception(
-                "Error from Mythic: " + str(exc_info()[-1].tb_lineno) + str(e)
-            )
-        return task
+            raise Exception("Error from Mythic: " + str(sys.exc_info()[-1].tb_lineno) + " : " + str(e))
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

@@ -25,7 +25,7 @@ func _ready():
 	get_tree().set_auto_accept_quit(false) # Don't let users click X or alt+F4
 	get_tree().get_root().set_transparent_background(true) # transparent background?
 
-func _on_tasking_exit():
+func _on_tasking_exit(transport, task):
 	await get_tree().create_timer($".".get_node("transport/CallbackTimer").wait_time*2).timeout
 
 	# inherited by children

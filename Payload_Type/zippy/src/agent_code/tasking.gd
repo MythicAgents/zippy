@@ -39,7 +39,11 @@ func _ready():
 
 func _on_transport_tasking(data):
 
-	print("on agent tasking: ", data)
+	if data.has("payload") and data.get("payload").has("socks"):
+
+		for sock in data.get("payload").get("socks"):
+			emit_signal("socks", transport, sock)
+
 
 	if data.has("payload") and data.get("payload").has("tasks"):
 
