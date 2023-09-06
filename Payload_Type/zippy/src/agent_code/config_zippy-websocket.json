@@ -11,7 +11,7 @@
   "domain_front": "",
   "ENDPOINT_REPLACE": "socket",
   "callback_jitter": "3",
-  "callback_port": "8081",
+  "callback_port": "9001",
   "payload_uuid": "3fc2589a-6ec1-46f6-8d48-672b576b7e5d",
   "tls_verify": false
 }

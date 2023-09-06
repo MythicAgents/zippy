@@ -8,7 +8,6 @@ class ClipboardArguments(TaskArguments):
         self.args = []
 
     async def parse_arguments(self):
-
         if len(self.command_line) > 0:
             raise Exception("clipboard takes no parameters.")
 

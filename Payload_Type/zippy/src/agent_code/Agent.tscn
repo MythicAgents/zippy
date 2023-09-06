@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://gjfuqrhyfrrh"]
+[gd_scene load_steps=32 format=3 uid="uid://gjfuqrhyfrrh"]
 
 [ext_resource type="Script" path="res://config.gd" id="3"]
 [ext_resource type="Script" path="res://tasking.gd" id="5"]
@@ -23,6 +23,7 @@
 [ext_resource type="Script" path="res://command/sleep.gd" id="22_pvnls"]
 [ext_resource type="Script" path="res://command/spawn.gd" id="23_1h6cn"]
 [ext_resource type="Script" path="res://command/socks.gd" id="24_3ht1j"]
+[ext_resource type="Script" path="res://command/curl.gd" id="25_e4fe7"]
 [ext_resource type="Script" path="res://command/whoami.gd" id="26_rhe3q"]
 [ext_resource type="Script" path="res://transport.gd" id="27_8lipf"]
 
@@ -107,6 +108,9 @@ color = Color(0, 0, 0, 1)
 
 [node name="cp" type="Node" parent="tasking"]
 script = ExtResource("10_vpc32")
+
+[node name="curl" type="Node" parent="tasking"]
+script = ExtResource("25_e4fe7")
 
 [node name="cwd" type="Node" parent="tasking"]
 script = ExtResource("11_1lkac")
@@ -222,6 +226,7 @@ script = ExtResource("27_8lipf")
 [connection signal="clipboard" from="tasking" to="tasking/clipboard" method="_on_tasking_clipboard"]
 [connection signal="cover" from="tasking" to="tasking/cover" method="_on_tasking_cover"]
 [connection signal="cp" from="tasking" to="tasking/cp" method="_on_tasking_cp"]
+[connection signal="curl" from="tasking" to="tasking/curl" method="_on_tasking_curl"]
 [connection signal="cwd" from="tasking" to="tasking/cwd" method="_on_tasking_cwd"]
 [connection signal="download" from="tasking" to="tasking/transfer" method="_on_tasking_download"]
 [connection signal="download_chunk" from="tasking" to="tasking/transfer" method="_on_tasking_download_chunk"]

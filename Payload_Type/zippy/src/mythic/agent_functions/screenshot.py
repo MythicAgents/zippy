@@ -14,7 +14,6 @@ class ScreenshotArguments(TaskArguments):
         ]
 
     async def parse_arguments(self):
-
         if len(self.command_line) > 0:
             self.add_arg("index", int(self.command_line))
 
@@ -26,7 +25,9 @@ class ScreenshotCommand(CommandBase):
     cmd = "screenshot"
     needs_admin = False
     help_cmd = "screenshot {index}"
-    description = "Attempt to retrieve a screenshot of a monitor at the specified screen index"
+    description = (
+        "Attempt to retrieve a screenshot of a monitor at the specified screen index"
+    )
     version = 1
     author = "@ArchiMoebius"
     attackmapping = []
@@ -36,16 +37,18 @@ class ScreenshotCommand(CommandBase):
     )
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        task.display_params = (
-            f'of monitor: {str(task.args.get_arg("index"))}'
-        )
+        task.display_params = f'of monitor: {str(task.args.get_arg("index"))}'
 
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+        resp = await MythicRPC().execute(
+            "create_artifact",
+            task_id=task.id,
             artifact="Godot Screenshot API invoked native call",
             artifact_type="API Called",
         )
         return task
 
-    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+    async def process_response(
+        self, task: PTTaskMessageAllData, response: any
+    ) -> PTTaskProcessResponseMessageResponse:
         resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
         return resp

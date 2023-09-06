@@ -4,17 +4,19 @@ from mythic_container.MythicRPC import *
 from sys import exc_info
 
 
-class UploadArguments(TaskArguments):
+class ExecuteAssemblyArguments(TaskArguments):
     def __init__(self, command_line, **kwargs):
         super().__init__(command_line, **kwargs)
         self.args = [
             CommandParameter(
-                name="file", type=ParameterType.File, description="file to upload"
+                name="binary",
+                type=ParameterType.File,
+                description="file to upload",
             ),
             CommandParameter(
-                name="remote_path",
+                name="arguments",
                 type=ParameterType.String,
-                description="/remote/path/on/victim.txt",
+                description="Arguments to pass when invoking the provided binary executable",
             ),
         ]
 
@@ -27,10 +29,10 @@ class UploadArguments(TaskArguments):
         self.load_args_from_dictionary(dictionary_arguments)
 
 
-class UploadCommand(CommandBase):
-    cmd = "upload"
+class ExecuteAssemblyCommand(CommandBase):
+    cmd = "execute_assembly"
     needs_admin = False
-    help_cmd = "upload"
+    help_cmd = "execute_assembly <assembly to upload and execute> <arguments>"
     description = (
         "Upload a file to the target machine by selecting a file from your computer. "
     )
@@ -38,9 +40,9 @@ class UploadCommand(CommandBase):
     supported_ui_features = ["file_browser:upload"]
     author = "@ArchiMoebius"
     attackmapping = ["T1132", "T1030", "T1105"]
-    argument_class = UploadArguments
+    argument_class = ExecuteAssemblyArguments
     attributes = CommandAttributes(
-        supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux],
+        supported_os=[SupportedOS.Windows, SupportedOS.Linux],
     )
 
     async def create_go_tasking(
@@ -53,20 +55,13 @@ class UploadCommand(CommandBase):
         try:
             file_resp = await SendMythicRPCFileSearch(
                 MythicRPCFileSearchMessage(
-                    TaskID=taskData.Task.ID, AgentFileID=taskData.args.get_arg("file")
+                    TaskID=taskData.Task.ID, AgentFileID=taskData.args.get_arg("binary")
                 )
             )
             if file_resp.Success:
                 if len(file_resp.Files) > 0:
                     original_file_name = file_resp.Files[0].Filename
-                    if len(taskData.args.get_arg("remote_path")) == 0:
-                        taskData.args.add_arg("remote_path", original_file_name)
-                    elif taskData.args.get_arg("remote_path")[-1] == "/":
-                        taskData.args.add_arg(
-                            "remote_path",
-                            taskData.args.get_arg("remote_path") + original_file_name,
-                        )
-                    response.DisplayParams = f"{original_file_name} to {taskData.args.get_arg('remote_path')}"
+                    response.DisplayParams = f" running {original_file_name} {taskData.args.get_arg('arguments')}"
                 else:
                     raise Exception("Failed to find that file")
             else:

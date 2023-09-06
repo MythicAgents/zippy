@@ -18,7 +18,6 @@ class LsArguments(TaskArguments):
         ]
 
     async def parse_arguments(self):
-
         if len(self.command_line) > 0:
             if self.command_line[0] == "{":
                 temp_json = json.loads(self.command_line)
@@ -45,13 +44,14 @@ class LsCommand(CommandBase):
     supported_ui_features = ["file_browser:list"]
     is_file_browse = True
     argument_class = LsArguments
-    browser_script = BrowserScript(script_name="ls", author="@djhohnstein", for_new_ui=True)
+    browser_script = BrowserScript(
+        script_name="ls", author="@djhohnstein", for_new_ui=True
+    )
     attributes = CommandAttributes(
         supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux],
     )
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-
         if task.args.has_arg("file_browser") and task.args.get_arg("file_browser"):
             task.display_params = f'{task.callback.host}:{task.args.get_arg("path")}'
         else:

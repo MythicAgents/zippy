@@ -2,29 +2,27 @@ from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
 import json
 
-class SocksArguments(TaskArguments):
 
+class SocksArguments(TaskArguments):
     valid_actions = ["start", "stop"]
 
     def __init__(self, command_line, **kwargs):
         super().__init__(command_line, **kwargs)
         self.args = [
             CommandParameter(
-                name="action", 
-                choices=["start","stop"], 
-                parameter_group_info=[ParameterGroupInfo(
-                    required=True
-                )], 
-                type=ParameterType.ChooseOne, 
-                description="Start or stop the socks server."
+                name="action",
+                choices=["start", "stop"],
+                parameter_group_info=[ParameterGroupInfo(required=True, ui_position=2)],
+                type=ParameterType.ChooseOne,
+                description="Start or stop the socks server.",
             ),
             CommandParameter(
-                name="port", 
-                parameter_group_info=[ParameterGroupInfo(
-                    required=False
-                )], 
-                type=ParameterType.Number, 
-                description="Port to start the socks server on."
+                name="port",
+                parameter_group_info=[
+                    ParameterGroupInfo(required=False, ui_position=1)
+                ],
+                type=ParameterType.Number,
+                description="Port to start the socks server on.",
             ),
         ]
 
@@ -33,14 +31,20 @@ class SocksArguments(TaskArguments):
 
     async def parse_arguments(self):
         if len(self.command_line) == 0:
-            raise Exception("Must be passed \"start\" or \"stop\" commands on the command line.")
+            raise Exception(
+                'Must be passed "start" or "stop" commands on the command line.'
+            )
         try:
             self.load_args_from_json_string(self.command_line)
         except:
             parts = self.command_line.lower().split()
             action = parts[0]
             if action not in self.valid_actions:
-                raise Exception("Invalid action \"{}\" given. Require one of: {}".format(action, ", ".join(self.valid_actions)))
+                raise Exception(
+                    'Invalid action "{}" given. Require one of: {}'.format(
+                        action, ", ".join(self.valid_actions)
+                    )
+                )
             self.add_arg("action", action)
             if action == "start":
                 port = -1
@@ -50,7 +54,11 @@ class SocksArguments(TaskArguments):
                     try:
                         port = int(parts[1])
                     except Exception as e:
-                        raise Exception("Invalid port number given: {}. Must be int.".format(parts[1]))
+                        raise Exception(
+                            "Invalid port number given: {}. Must be int.".format(
+                                parts[1]
+                            )
+                        )
                 self.add_arg("port", port, ParameterType.Number)
 
 
@@ -70,53 +78,64 @@ class SocksCommand(CommandBase):
     argument_class = SocksArguments
     attackmapping = ["T1090"]
     attributes = CommandAttributes(
-        supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux ],
+        supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux],
     )
 
-
-
-    async def create_go_tasking(self, taskData: PTTaskMessageAllData) -> PTTaskCreateTaskingMessageResponse:
+    async def create_go_tasking(
+        self, taskData: PTTaskMessageAllData
+    ) -> PTTaskCreateTaskingMessageResponse:
         response = PTTaskCreateTaskingMessageResponse(
             TaskID=taskData.Task.ID,
             Success=True,
         )
         if taskData.args.get_arg("action") == "start":
-            resp = await SendMythicRPCProxyStartCommand(MythicRPCProxyStartMessage(
-                TaskID=taskData.Task.ID,
-                PortType="socks",
-                LocalPort=taskData.args.get_arg("port")
-            ))
+            resp = await SendMythicRPCProxyStartCommand(
+                MythicRPCProxyStartMessage(
+                    TaskID=taskData.Task.ID,
+                    PortType="socks",
+                    LocalPort=taskData.args.get_arg("port"),
+                )
+            )
 
             if not resp.Success:
                 response.TaskStatus = MythicStatus.Error
                 response.Stderr = resp.Error
-                await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
-                    TaskID=taskData.Task.ID,
-                    Response=resp.Error.encode()
-                ))
+                await SendMythicRPCResponseCreate(
+                    MythicRPCResponseCreateMessage(
+                        TaskID=taskData.Task.ID, Response=resp.Error.encode()
+                    )
+                )
             else:
-                response.DisplayParams = "Started SOCKS5 server on port {}".format(taskData.args.get_arg("port"))
+                response.DisplayParams = "Started SOCKS5 server on port {}".format(
+                    taskData.args.get_arg("port")
+                )
                 response.TaskStatus = MythicStatus.Success
         else:
-            resp = await SendMythicRPCProxyStopCommand(MythicRPCProxyStopMessage(
-                TaskID=taskData.Task.ID,
-                PortType="socks",
-                LocalPort=taskData.args.get_arg("port")
-            ))
+            resp = await SendMythicRPCProxyStopCommand(
+                MythicRPCProxyStopMessage(
+                    TaskID=taskData.Task.ID,
+                    PortType="socks",
+                    LocalPort=taskData.args.get_arg("port"),
+                )
+            )
             if not resp.Success:
                 response.TaskStatus = MythicStatus.Error
                 response.Stderr = resp.Error
-                await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
-                    TaskID=taskData.Task.ID,
-                    Response=resp.Error.encode()
-                ))
+                await SendMythicRPCResponseCreate(
+                    MythicRPCResponseCreateMessage(
+                        TaskID=taskData.Task.ID, Response=resp.Error.encode()
+                    )
+                )
             else:
-                response.DisplayParams = "Stopped SOCKS5 server on port {}".format(taskData.args.get_arg("port"))
+                response.DisplayParams = "Stopped SOCKS5 server on port {}".format(
+                    taskData.args.get_arg("port")
+                )
                 response.TaskStatus = MythicStatus.Success
                 response.Completed = True
         return response
 
-
-    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+    async def process_response(
+        self, task: PTTaskMessageAllData, response: any
+    ) -> PTTaskProcessResponseMessageResponse:
         resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
         return resp

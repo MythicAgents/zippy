@@ -24,6 +24,7 @@ class CatArguments(TaskArguments):
         else:
             raise ValueError("Missing arguments")
 
+
 class CatCommand(CommandBase):
     cmd = "cat"
     needs_admin = False
@@ -31,16 +32,18 @@ class CatCommand(CommandBase):
     description = "Read and output the contents of a file"
     version = 1
     author = "@ajpc500"
-    attackmapping = [ "T1005" ]
+    attackmapping = ["T1005"]
     argument_class = CatArguments
     attributes = CommandAttributes(
-        supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux ],
+        supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux],
     )
-    
+
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         task.display_params = task.args.get_arg("path")
         return task
 
-    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+    async def process_response(
+        self, task: PTTaskMessageAllData, response: any
+    ) -> PTTaskProcessResponseMessageResponse:
         resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
         return resp

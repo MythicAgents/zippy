@@ -9,6 +9,7 @@ from mythic_container.PayloadBuilder import *
 from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
 
+
 class Zippy(PayloadType):
     name = "zippy"
     file_extension = ""
@@ -47,10 +48,15 @@ class Zippy(PayloadType):
     agent_path = pathlib.Path(".") / "src" / "mythic"
     agent_code_path = pathlib.Path(".") / "src" / "agent_code"
     agent_icon_path = agent_path / "agent_functions" / "logo.svg"
-    
+
     build_steps = [
-        BuildStep(step_name="Gathering Files", step_description="Copying files to temp location"),
-        BuildStep(step_name="Compiling", step_description="Compiling with nuget and msbuild"),
+        BuildStep(
+            step_name="Gathering Files",
+            step_description="Copying files to temp location",
+        ),
+        BuildStep(
+            step_name="Compiling", step_description="Compiling with nuget and msbuild"
+        ),
         BuildStep(step_name="Praise", step_description="Praise Thah...it finished!"),
     ]
 
@@ -67,10 +73,8 @@ class Zippy(PayloadType):
                 copy_tree(self.agent_code_path, agent_build_path)
 
                 for c2 in self.c2info:
-
                     try:
                         profile = c2.get_c2profile()
-                        
 
                         with open(
                             f"{agent_build_path}/config_{profile.get('name', '')}.json",
@@ -89,12 +93,14 @@ class Zippy(PayloadType):
                 outputType = self.get_parameter("arch").lower()
                 debug = self.get_parameter("debug")
 
-                await SendMythicRPCPayloadUpdatebuildStep(MythicRPCPayloadUpdateBuildStepMessage(
-                    PayloadUUID=self.uuid,
-                    StepName="Gathering Files",
-                    StepStdout="Found all files for payload",
-                    StepSuccess=True
-                ))
+                await SendMythicRPCPayloadUpdatebuildStep(
+                    MythicRPCPayloadUpdateBuildStepMessage(
+                        PayloadUUID=self.uuid,
+                        StepName="Gathering Files",
+                        StepStdout="Found all files for payload",
+                        StepSuccess=True,
+                    )
+                )
 
                 build_type = "--export-debug" if debug else "--export-release"
 
@@ -114,7 +120,9 @@ class Zippy(PayloadType):
                 if stderr:
                     build_msg += f"[stderr]\n{stderr.decode()}" + "\n" + command
 
-                built_file_extension = 'exe' if self.selected_os.lower() == 'windows' else 'elf'
+                built_file_extension = (
+                    "exe" if self.selected_os.lower() == "windows" else "elf"
+                )
 
                 with open(
                     f"{agent_build_path}/build/zippy_{self.selected_os.lower()}_{outputType}.{built_file_extension}",
@@ -123,30 +131,36 @@ class Zippy(PayloadType):
                     resp.payload = fh.read()
                     build_msg += f"Built: {agent_build_path}"
 
-                await SendMythicRPCPayloadUpdatebuildStep(MythicRPCPayloadUpdateBuildStepMessage(
-                    PayloadUUID=self.uuid,
-                    StepName="Compiling",
-                    StepStdout=f"Successfully built!\n{agent_build_path}",
-                    StepSuccess=True
-                ))
+                await SendMythicRPCPayloadUpdatebuildStep(
+                    MythicRPCPayloadUpdateBuildStepMessage(
+                        PayloadUUID=self.uuid,
+                        StepName="Compiling",
+                        StepStdout=f"Successfully built!\n{agent_build_path}",
+                        StepSuccess=True,
+                    )
+                )
                 resp.status = BuildStatus.Success
         except Exception as e:
-            await SendMythicRPCPayloadUpdatebuildStep(MythicRPCPayloadUpdateBuildStepMessage(
-                PayloadUUID=self.uuid,
-                StepName="Compiling",
-                StepStdout=f"Oh snap {e}\n{build_msg}",
-                StepSuccess=False
-            ))
+            await SendMythicRPCPayloadUpdatebuildStep(
+                MythicRPCPayloadUpdateBuildStepMessage(
+                    PayloadUUID=self.uuid,
+                    StepName="Compiling",
+                    StepStdout=f"Oh snap {e}\n{build_msg}",
+                    StepSuccess=False,
+                )
+            )
             resp.status = BuildStatus.Error
             resp.payload = b""
             resp.build_message = f"Unknown error while building payload. Check the stderr for this build. {e}"
             resp.build_stderr = build_msg
         finally:
-            await SendMythicRPCPayloadUpdatebuildStep(MythicRPCPayloadUpdateBuildStepMessage(
-                PayloadUUID=self.uuid,
-                StepName="Praise",
-                StepStdout="Ah ha - we're done...did it work?\n{build_msg}",
-                StepSuccess=True
-            ))
+            await SendMythicRPCPayloadUpdatebuildStep(
+                MythicRPCPayloadUpdateBuildStepMessage(
+                    PayloadUUID=self.uuid,
+                    StepName="Praise",
+                    StepStdout="Ah ha - we're done...did it work?\n{build_msg}",
+                    StepSuccess=True,
+                )
+            )
 
         return resp

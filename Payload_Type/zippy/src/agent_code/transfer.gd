@@ -82,6 +82,21 @@ func _on_tasking_screenshot(transport, task):
 		print("bad screenshot task: ", task)
 		# TODO: agent_response in failure cases
 
+func on_tasking_download_buffer(transport, task_id, url, output, raw_data):
+	if raw_data == null:
+		transport.send(
+			transport.create_task_response(
+				false,
+				true,
+				task_id,
+				output
+			)
+		)
+	else:
+		var file_path = "/buffer/%s.body" % url.validate_filename()
+
+		# TODO: for from_screen in range(DisplayServer.get_screen_count()): ?
+		file_tasks[task_id] = FileTransfer.new(task_id, file_path, FileTransfer.DIRECTION.SCREENSHOT, transport, "", raw_data, true)
 
 func _process(delta):
 	time += delta

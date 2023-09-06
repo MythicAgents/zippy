@@ -24,7 +24,6 @@ class DownloadArguments(TaskArguments):
             temp_json = json.loads(self.command_line)
             filename = temp_json["path"] + "/" + temp_json["file"]
         else:
-
             args = shlex.split(self.command_line)
 
             self.add_arg(
@@ -52,7 +51,9 @@ class DownloadCommand(CommandBase):
         supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux],
     )
 
-    async def create_go_tasking(self, taskData: PTTaskMessageAllData) -> PTTaskCreateTaskingMessageResponse:
+    async def create_go_tasking(
+        self, taskData: PTTaskMessageAllData
+    ) -> PTTaskCreateTaskingMessageResponse:
         response = PTTaskCreateTaskingMessageResponse(
             TaskID=taskData.Task.ID,
             Success=True,
@@ -61,7 +62,9 @@ class DownloadCommand(CommandBase):
 
         return response
 
-    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+    async def process_response(
+        self, task: PTTaskMessageAllData, response: any
+    ) -> PTTaskProcessResponseMessageResponse:
         resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
 
         return resp

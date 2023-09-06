@@ -14,7 +14,6 @@ class KillArguments(TaskArguments):
         ]
 
     async def parse_arguments(self):
-
         if len(self.command_line) > 0:
             self.add_arg("pid", self.command_line)
 

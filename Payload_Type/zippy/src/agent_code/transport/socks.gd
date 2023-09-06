@@ -58,14 +58,14 @@ func parse_socks5_request(data:PackedByteArray):
 
 	_client = StreamPeerTCP.new()
 
-	print("connect to host: %s:%d", [_addr, _port])
+	print_debug("connect to host: %s:%d", [_addr, _port])
 
 	var ret = _client.connect_to_host(_addr, _port)
 	var rep = REP_SUCCEEDED
 	var reply = PackedByteArray([VER, rep, 0x00, ATYP_IPV4, 0x00,0x00,0x00,0x00,0x00,0x00])
 
 	if ret != OK:
-		print("oh-fuck!...failed to connect...", ret)
+		print_debug("failed to connect...", ret)
 		reply[1] = REP_SERVER_FAILURE
 	else:
 		var peerIP:String = _client.get_connected_host() # gdscript is dumb...there is no 'get_local_host()'...why...
@@ -77,7 +77,7 @@ func parse_socks5_request(data:PackedByteArray):
 			idx += 1
 		var peerPort:PackedByteArray = var_to_bytes(_client.get_local_port())
 
-		print("connected from : %s %d" % [peerIP, _client.get_local_port()])
+		print_debug("connected from : %s %d" % [peerIP, _client.get_local_port()])
 
 		# our IP + our PORT...so nasty...assumes we're little endian...todo...
 		reply.encode_u8(8, peerPort[1])
@@ -90,7 +90,7 @@ func parse_socks5_request(data:PackedByteArray):
 
 func _init(Transport, id, b64data):
 	if b64data == null:
-		print("bad init for socks object...why...")
+		print_debug("bad init for socks object...why...")
 		return
 
 	transport = Transport
@@ -110,17 +110,14 @@ func send(b64data):
 func a2e():
 	# drain our outbound queue...
 	while outbound.size() > 0:
-		print("-------A2E-START-------")
 		var packet = outbound.pop_front() # FIFO it!
-		print("sent packet: ", packet)
 
 		if OK != _client.put_data(packet):
-			print("oh-snap, something went awry w/ : ", packet)
-		print("-------A2E-END----------")
+			print_debug("oh-snap, something went awry w/ : ", packet)
+			pass
 
 
 func a2m(data, exit=false):
-	print("-------A2M: ", data)
 	if data != null:
 		data = Marshalls.raw_to_base64(data)
 
@@ -143,16 +140,15 @@ func _process(delta):
 	if _time > _heartbeat_period:
 
 		if client_is_connected() == 1:
-			print("socks connected")
-
+			
 			if _client.get_available_bytes() > 0:
-				print("has data for mythic")
 				var data = _client.get_partial_data(2048)
 
-				if data is Array:
-					a2m(data)
+				if data is Array and data[0] == OK:
+					a2m(data[1])
 				else:
-					print("something went wrong reading remote: ", data)
+					print_debug("something went wrong reading remote: ", data)
+					pass
 
 			a2e()
 		# reset our heartbeat timer
@@ -172,18 +168,19 @@ func client_is_connected():
 		return -1
 
 	var poll_status = _client.poll()
-	
+
 	if poll_status != OK:
-		print("poll_status: ", poll_status)
+		print_debug("poll_status: ", poll_status)
+		pass
 
 	var status = _client.get_status()
 
 	if status == StreamPeerTCP.STATUS_NONE or status == StreamPeerTCP.STATUS_ERROR:
-		print("SOCKS client closed", status)
+		print_debug("SOCKS client closed", status)
 		return -1
 	elif status == StreamPeerTCP.STATUS_CONNECTED:
-		print("SOCKS client connected/ing")
+		print_debug("SOCKS client connected/ing")
 		return 1
 	else:
-		print("SOCKS client in unknown state", status)
+		print_debug("SOCKS client in unknown state", status)
 		return 0

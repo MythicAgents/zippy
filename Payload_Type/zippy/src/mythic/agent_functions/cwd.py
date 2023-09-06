@@ -2,6 +2,7 @@ from mythic_container.MythicCommandBase import *
 import json
 from mythic_container.MythicRPC import *
 
+
 class GetCwdArguments(TaskArguments):
     def __init__(self, command_line, **kwargs):
         super().__init__(command_line, **kwargs)
@@ -27,12 +28,14 @@ class GetCwdCommand(CommandBase):
     argument_class = GetCwdArguments
     attackmapping = []
     attributes = CommandAttributes(
-        supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux ],
+        supported_os=[SupportedOS.MacOS, SupportedOS.Windows, SupportedOS.Linux],
     )
-    
+
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         return task
 
-    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+    async def process_response(
+        self, task: PTTaskMessageAllData, response: any
+    ) -> PTTaskProcessResponseMessageResponse:
         resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
         return resp

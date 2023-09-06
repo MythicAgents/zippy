@@ -31,7 +31,7 @@ class Websocket(C2Profile):
             parameter_type=ParameterType.ChooseOne,
             choices=["aes256_hmac", "none"],
             required=False,
-            crypto_type=True
+            crypto_type=True,
         ),
         C2ProfileParameter(
             name="callback_interval",
@@ -69,7 +69,7 @@ class Websocket(C2Profile):
         C2ProfileParameter(
             name="callback_port",
             description="Callback Port",
-            default_value="8081",
+            default_value="9001",
             verifier_regex="^[0-9]+$",
             required=False,
         ),

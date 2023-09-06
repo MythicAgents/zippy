@@ -10,9 +10,10 @@ class CoverArguments(TaskArguments):
         self.args = []
 
     async def parse_arguments(self):
-
         if len(self.command_line.strip()) == 0:
-            raise ValueError("Really - what are you doing? Give me a truthy value (not zero is on)")
+            raise ValueError(
+                "Really - what are you doing? Give me a truthy value (not zero is on)"
+            )
 
         args = shlex.split(self.command_line)
 
@@ -33,8 +34,8 @@ class CoverCommand(CommandBase):
     )
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        state = "on" if  task.args.get_arg("state") != 0 else "off"
-        task.display_params = f'is {state}'
+        state = "on" if task.args.get_arg("state") != 0 else "off"
+        task.display_params = f"is {state}"
         return task
 
     async def process_response(self, response: AgentResponse):

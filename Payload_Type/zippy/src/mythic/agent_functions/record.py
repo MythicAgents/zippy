@@ -10,9 +10,10 @@ class RecordArguments(TaskArguments):
         self.args = []
 
     async def parse_arguments(self):
-
         if len(self.command_line.strip()) == 0:
-            raise ValueError("Really - what are you doing? Give me the number of seconds I should record...")
+            raise ValueError(
+                "Really - what are you doing? Give me the number of seconds I should record..."
+            )
 
         args = shlex.split(self.command_line)
 

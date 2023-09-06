@@ -8,6 +8,7 @@ signal cat
 signal clipboard
 signal cover
 signal cp
+signal curl
 signal cwd
 signal download
 signal download_chunk
