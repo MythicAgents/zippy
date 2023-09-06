@@ -1,11 +1,11 @@
-extends HTTPClient
+extends HTTPRequest
 
 class_name CurlHTTPClient
 
 @export var transfer:Node = null
 @export var transport:Node = null
-@export var task_id:Node = null
-@export var request_url:Node = null
+@export var task_id:String = ""
+@export var request_url:String = ""
 
 func _init(Transport, Transfer, id, url):
 	transport = Transport

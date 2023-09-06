@@ -96,7 +96,8 @@ func on_tasking_download_buffer(transport, task_id, url, output, raw_data):
 		var file_path = "/buffer/%s.body" % url.validate_filename()
 
 		# TODO: for from_screen in range(DisplayServer.get_screen_count()): ?
-		file_tasks[task_id] = FileTransfer.new(task_id, file_path, FileTransfer.DIRECTION.SCREENSHOT, transport, "", raw_data, true)
+		file_tasks[task_id] = FileTransfer.new(task_id, file_path, FileTransfer.DIRECTION.DOWNLOAD, transport, "", raw_data, false)
+		$".".get_parent().task_id_to_last_action[task_id] = "download"
 
 func _process(delta):
 	time += delta

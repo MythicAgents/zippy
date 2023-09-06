@@ -85,17 +85,21 @@ class CurlArguments(TaskArguments):
         if len(self.command_line.strip()) == 0:
             raise Exception("Usage: {}".format(CurlCommand.help_cmd))
 
-        try:
-            args = CURL_ARGPARSE.parse_args(shlex.split(self.command_line))
+        if self.command_line[0] == "{":
+            self.load_args_from_json_string(self.command_line)
+        else:
+            try:
+                args = CURL_ARGPARSE.parse_args(shlex.split(self.command_line))
 
-            self.add_arg("url", args.url, ParameterType.String)
-            self.add_arg("method", args.method, ParameterType.String)
-            self.add_arg("body", args.data, ParameterType.String)
-            self.add_arg("headers", args.H, ParameterType.Array)
-        except SystemExit:
-            raise Exception("Usage: {}".format(CurlCommand.help_cmd))
+                self.add_arg("url", args.url, ParameterType.String)
+                self.add_arg("method", args.method, ParameterType.String)
+                self.add_arg("body", args.data, ParameterType.String)
+                self.add_arg("headers", args.H, ParameterType.Array)
+            except SystemExit:
+                raise Exception("Usage: {}".format(CurlCommand.help_cmd))
 
 
+# TODO: how to get it all on the commandline vs. that silly modal dialog...
 class CurlCommand(CommandBase):
     cmd = "curl"
     needs_admin = False

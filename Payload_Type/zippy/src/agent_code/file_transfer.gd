@@ -34,7 +34,7 @@ func _init(taskId, filePath, fileDirection, Transport, fileId = "", rawData:Pack
 
 	if isFromScreenshot:
 		# file_path is the screen index to capture
-		file_path = filePath
+		file_path = filePath.validate_filename()
 	else:
 		# we're uploading/downloading data
 		file_path = filePath.simplify_path()
@@ -146,7 +146,6 @@ func process_download():
 		if is_screenshot:
 			print("\nScreenshot _process monitor: ", file_path)
 
-
 		if raw_data.size() > 0:
 			file_size = raw_data.size()
 
@@ -155,15 +154,20 @@ func process_download():
 			chunk_count = int(file_size / chunk_size) + extra
 		else:
 			file_handle = FileAccess.open(file_path , FileAccess.READ)
+			var error = -1
 
-			if file_handle.is_open():
+			if file_handle != null and file_handle.is_open():
 				file_path = file_handle.get_path_absolute()
 				file_size = file_handle.get_length()
 				
 				state = STATUS.BEGIN
 			else:
 				state = STATUS.ERROR
-				user_output = "Error code: %d\nFile: %s" % [file_handle.get_error(), file_path]
+				
+				if file_handle != null:
+					error = file_handle.get_error()
+
+				user_output = "Error code: %d\nFile: %s" % [error, file_path]
 
 			if file_size > 0:
 				if file_size % chunk_size > 0:

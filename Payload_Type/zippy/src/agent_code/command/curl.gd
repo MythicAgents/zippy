@@ -32,7 +32,7 @@ func _on_tasking_curl(transport, task):
 		headers.append(header)
 
 	# Create an HTTP request node and connect its completion signal.
-	var http_request = CurlHTTPClient.new($".".get_node("transfer"), transport, task.get("id"), url)
+	var http_request = CurlHTTPClient.new(transport, $".".get_parent().get_node("transfer"), task.get("id"), url)
 	http_request.set_tls_options(TLSOptions.client_unsafe())
 	http_request.set_use_threads(true)
 

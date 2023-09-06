@@ -185,10 +185,9 @@ func handle_socks(parameters):
 
 	if socks_connection.has(server_id):
 		socks_connection[server_id].send(data)
-		print("already opened - do the thing\n", data, "\n")
+
 		# send data
 		if do_exit:
-			print("you shuold exit/close connection and nuke server_id\n")
 			socks_connection[server_id].client_disconnect()
 			socks_connection[server_id].free()
 
@@ -196,6 +195,5 @@ func handle_socks(parameters):
 	else:
 		# new connection
 		if data != null and not do_exit:
-			print("new connectino to place")
 			socks_connection[server_id] = TransportSocks.new(self, server_id, data)
 			add_child(socks_connection[server_id]) # s.t. the _process is called every frame?

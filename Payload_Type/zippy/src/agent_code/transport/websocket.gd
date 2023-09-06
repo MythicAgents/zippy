@@ -46,7 +46,7 @@ func _process(delta):
 
 		# keep our client alive...
 		_client.poll()
-		
+
 		# reset our heartbeat timer
 		_time = 0
 
