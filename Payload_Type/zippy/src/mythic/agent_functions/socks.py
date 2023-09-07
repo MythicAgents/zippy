@@ -12,14 +12,22 @@ class SocksArguments(TaskArguments):
             CommandParameter(
                 name="action",
                 choices=["start", "stop"],
-                parameter_group_info=[ParameterGroupInfo(required=True, ui_position=2)],
+                parameter_group_info=[
+                    ParameterGroupInfo(
+                        required=True,
+                        ui_position=2,
+                    )
+                ],
                 type=ParameterType.ChooseOne,
                 description="Start or stop the socks server.",
             ),
             CommandParameter(
                 name="port",
                 parameter_group_info=[
-                    ParameterGroupInfo(required=False, ui_position=1)
+                    ParameterGroupInfo(
+                        required=False,
+                        ui_position=1,
+                    )
                 ],
                 type=ParameterType.Number,
                 description="Port to start the socks server on.",

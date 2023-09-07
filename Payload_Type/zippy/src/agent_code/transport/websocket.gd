@@ -14,7 +14,7 @@ signal disconnected
 var _client = null
 var _client_options = null
 var _time = 0
-var _heartbeat_period = 30
+var _heartbeat_period = 5
 var connect_attempt = 0
 var outbound = []
 var do_exit = false
@@ -40,6 +40,7 @@ func _process(delta):
 	_time += delta
 	# TODO: this is not being called until we add_child in transport...duh...
 	if _time > _heartbeat_period:
+		print("heartbeat time")
 
 		if _client == null:
 			_setup_client()
@@ -142,7 +143,7 @@ func unwrap_payload(packet):
 
 func client_connect():
 
-	if client_is_connected() != -1:
+	if client_is_connected() == 1:
 		# if we're opening or already connected
 		return true
 
@@ -151,15 +152,14 @@ func client_connect():
 		emit_signal("disconnected")
 		return false
 	else:
+		connect_attempt -= 1
+
 		print("calling coonnect to: ", config.get_callback_uri())
 		var err = _client.connect_to_url(config.get_callback_uri(), _client_options)
 
 		if err != OK:
-			print("FFFFFFFFFUUUUUUUUUUUUCCCCCCCCCCCKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
-			connect_attempt -= 1
 			return false
 		else:
-			print("ohhhhhhyyyyyeeeeeaaaaahhhh.....")
 			connect_attempt = config.MAX_CONNECT_ATTEMPT
 			return true
 	

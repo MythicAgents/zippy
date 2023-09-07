@@ -28,7 +28,7 @@ const REP_ADDRESS_FAILURE = 0x08 # Address type not supported
 var _client:StreamPeerTCP = null
 var _client_options = null
 var _time = 0
-var _heartbeat_period = 0.5
+var _heartbeat_period = 0.01
 var connect_attempt = 0
 var outbound = []
 var do_exit = false
@@ -176,10 +176,8 @@ func client_is_connected():
 	var status = _client.get_status()
 
 	if status == StreamPeerTCP.STATUS_NONE or status == StreamPeerTCP.STATUS_ERROR:
-		print_debug("SOCKS client closed", status)
 		return -1
 	elif status == StreamPeerTCP.STATUS_CONNECTED:
-		print_debug("SOCKS client connected/ing")
 		return 1
 	else:
 		print_debug("SOCKS client in unknown state", status)

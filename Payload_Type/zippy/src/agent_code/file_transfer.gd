@@ -34,7 +34,7 @@ func _init(taskId, filePath, fileDirection, Transport, fileId = "", rawData:Pack
 
 	if isFromScreenshot:
 		# file_path is the screen index to capture
-		file_path = filePath.validate_filename()
+		file_path = filePath
 	else:
 		# we're uploading/downloading data
 		file_path = filePath.simplify_path()
