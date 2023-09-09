@@ -1,5 +1,5 @@
 +++
-title = "ls"
+title = "cat"
 chapter = false
 weight = 116
 hidden = false
@@ -7,26 +7,20 @@ hidden = false
 
 ## Summary
 
-List directory or file
-
+cat a file - like the Linux command.
+  
 - Needs Admin: maybe...
-- Version: 1  
+- Version: 1
 - Author: @ArchiMoebius  
 
 ### Arguments
 
-None.
-
 ## Usage
 
 ```
-ls /home/
+cat path/to/a/file
 ```
-
-## MITRE ATT&CK Mapping
-
-- T1083  
 
 ## Detailed Summary
 
-List the contents of a directory
+cat the supplied file path to view its contents.

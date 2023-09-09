@@ -1,7 +1,7 @@
 +++
 title = "whoami"
 chapter = false
-weight = 125
+weight = 116
 hidden = false
 +++
 
@@ -25,7 +25,8 @@ whoami
 
 ## MITRE ATT&CK Mapping
 
-- T1059  
+- T1059
+
 ## Detailed Summary
 
 Execute the whoami command

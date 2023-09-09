@@ -1,5 +1,5 @@
 +++
-title = "ls"
+title = "cwd"
 chapter = false
 weight = 116
 hidden = false
@@ -7,10 +7,10 @@ hidden = false
 
 ## Summary
 
-List directory or file
+cwd - current working directory.
 
-- Needs Admin: maybe...
-- Version: 1  
+- Needs Admin: no
+- Version: 1
 - Author: @ArchiMoebius  
 
 ### Arguments
@@ -20,13 +20,9 @@ None.
 ## Usage
 
 ```
-ls /home/
+cwd
 ```
-
-## MITRE ATT&CK Mapping
-
-- T1083  
 
 ## Detailed Summary
 
-List the contents of a directory
+Returns the current working directory - in absolute form.

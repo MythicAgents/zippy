@@ -1,5 +1,5 @@
 +++
-title = "ls"
+title = "cp"
 chapter = false
 weight = 116
 hidden = false
@@ -7,26 +7,20 @@ hidden = false
 
 ## Summary
 
-List directory or file
+cp a file - like the Linux command.
 
 - Needs Admin: maybe...
-- Version: 1  
+- Version: 1
 - Author: @ArchiMoebius  
 
 ### Arguments
 
-None.
-
 ## Usage
 
 ```
-ls /home/
+cp path/to/a/file_source path/to/a/file_destination
 ```
-
-## MITRE ATT&CK Mapping
-
-- T1083  
 
 ## Detailed Summary
 
-List the contents of a directory
+copy the file_source to the file_destination.

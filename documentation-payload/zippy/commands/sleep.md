@@ -1,5 +1,5 @@
 +++
-title = "shell"
+title = "sleep"
 chapter = false
 weight = 116
 hidden = false
@@ -7,7 +7,7 @@ hidden = false
 
 ## Summary
 
-On Linux and Windows - execute commands using either `bash` or `cmd.exe`
+Sleep for seconds before calling back
   
 - Needs Admin: False
 - Version: 1  
@@ -15,12 +15,12 @@ On Linux and Windows - execute commands using either `bash` or `cmd.exe`
 
 ### Arguments
 
-Whatever command you want to execute
+seconds - how long to delay calling back
 
 ## Usage
 
 ```
-shell command arguments
+sleep seconds
 ```
 
 ## MITRE ATT&CK Mapping
@@ -29,4 +29,4 @@ shell command arguments
 
 ## Detailed Summary
 
-Execute a shell command
+Request the agent sleep for the provided seconds before calling back again.

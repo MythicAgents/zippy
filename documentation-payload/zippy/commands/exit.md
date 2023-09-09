@@ -1,7 +1,7 @@
 +++
 title = "exit"
 chapter = false
-weight = 106
+weight = 116
 hidden = false
 +++
 
@@ -22,7 +22,6 @@ None.
 ```
 exit
 ```
-
 
 ## Detailed Summary
 

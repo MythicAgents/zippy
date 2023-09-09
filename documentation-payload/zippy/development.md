@@ -7,13 +7,15 @@ pre = "<b>3. </b>"
 
 ## Development Environment
 
-For command development, please use Godot 3.4+
+For command development, please use Godot 4.1+
 
 ## Adding Commands
 
-Look at the ls command and follow the pattern...TODO more description here...
-
+* Create a Signal (see tasking Node)
+* Create a Node
+* Attach the signal to the new Node
+* Create a GDScript and attach it to the new Node
 
 ## Adding C2 Profiles
 
-- Nope, just websocket profile at this time - some refactoring will need to occure to support other profiles - tho, it wouldn't be hard - I just don't care.
+- Nope, just the zippy-websocket profile at this time - support for other profiles wouldn't be difficult - I just don't care :-P

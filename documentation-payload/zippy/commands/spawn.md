@@ -1,5 +1,5 @@
 +++
-title = "shell"
+title = "spawn"
 chapter = false
 weight = 116
 hidden = false
@@ -7,8 +7,8 @@ hidden = false
 
 ## Summary
 
-On Linux and Windows - execute commands using either `bash` or `cmd.exe`
-  
+On Linux and Windows - execute commands using either `bash` or `cmd.exe` - detached process.
+
 - Needs Admin: False
 - Version: 1  
 - Author: @ArchiMoebius  
@@ -20,7 +20,7 @@ Whatever command you want to execute
 ## Usage
 
 ```
-shell command arguments
+spawn command arguments
 ```
 
 ## MITRE ATT&CK Mapping
@@ -29,4 +29,4 @@ shell command arguments
 
 ## Detailed Summary
 
-Execute a shell command
+Execute a command with arguments in a detached state.
