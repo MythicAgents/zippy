@@ -16,7 +16,7 @@ class RansomCommand(CommandBase):
     needs_admin = False
     help_cmd = "ransom"
     description = "Task the implant to show the Ransom screen"
-    version = 2
+    version = 1
     is_file_browse = False
     is_process_list = False
     is_download_file = False

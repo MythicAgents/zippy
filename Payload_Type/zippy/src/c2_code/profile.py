@@ -54,8 +54,8 @@ class Websocket(C2Profile):
         ),
         C2ProfileParameter(
             name="callback_jitter",
-            description="Callback Jitter in percent",
-            default_value="37",
+            description="Callback Jitter in seconds",
+            default_value="5",
             verifier_regex="^[0-9]+$",
             required=False,
         ),

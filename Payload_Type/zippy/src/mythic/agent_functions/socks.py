@@ -1,6 +1,7 @@
+import json
+
 from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
-import json
 
 
 class SocksArguments(TaskArguments):
@@ -82,7 +83,7 @@ class SocksCommand(CommandBase):
     is_download_file = False
     is_upload_file = False
     is_remove_file = False
-    author = "@ajpc500"
+    author = "@ArchiMoebius"
     argument_class = SocksArguments
     attackmapping = ["T1090"]
     attributes = CommandAttributes(

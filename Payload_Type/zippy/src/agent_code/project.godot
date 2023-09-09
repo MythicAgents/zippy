@@ -25,12 +25,16 @@ driver/enable_input=true
 
 [compression]
 
-formats/zstd/long_distance_matching=true
 formats/zstd/compression_level=9
+
+[debug]
+
+file_logging/enable_file_logging.pc=false
 
 [display]
 
-window/size/viewport_height=768
+window/size/viewport_width=1
+window/size/viewport_height=1
 window/size/mode=1
 window/size/initial_position_type=0
 window/size/resizable=false
@@ -48,6 +52,11 @@ window/per_pixel_transparency/enabled=true
 
 convert_text_resources_to_binary_on_export=true
 
+[filesystem]
+
+import/blender/enabled=false
+import/fbx/enabled=false
+
 [navigation]
 
 2d/use_edge_connections=false
@@ -62,8 +71,11 @@ limits/webrtc/max_channel_in_buffer_kb=1024
 
 [physics]
 
+2d/run_on_separate_thread=true
+3d/run_on_separate_thread=true
 common/enable_pause_aware_picking=true
 
 [rendering]
 
+viewport/transparent_background=true
 environment/defaults/default_environment="res://default_env.tres"

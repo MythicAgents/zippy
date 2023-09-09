@@ -2,12 +2,11 @@ import asyncio
 import os
 import shutil
 import tempfile
-
 from distutils.dir_util import copy_tree
 
-from mythic_container.PayloadBuilder import *
 from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
+from mythic_container.PayloadBuilder import *
 
 
 class Zippy(PayloadType):
@@ -23,7 +22,7 @@ class Zippy(PayloadType):
     wrapper = False
     wrapped_payloads = []
     note = """No headless display support - requires opengl!"""
-    supports_dynamic_loading = False  # setting this to True allows users to only select a subset of commands when generating a payload
+    supports_dynamic_loading = False
     build_parameters = {
         BuildParameter(
             name="arch",
@@ -61,6 +60,8 @@ class Zippy(PayloadType):
         BuildStep(step_name="Praise", step_description="Praise Thah...it finished!"),
     ]
 
+    translation_container = None
+
     async def build(self) -> BuildResponse:
         resp = BuildResponse(
             status=BuildStatus.Success, build_stdout=f"{self.selected_os}"
@@ -76,6 +77,7 @@ class Zippy(PayloadType):
                 for c2 in self.c2info:
                     try:
                         profile = c2.get_c2profile()
+                        c2_config = c2.get_parameters_dict()
 
                         with open(
                             f"{agent_build_path}/config_{profile.get('name', '')}.json",
@@ -159,7 +161,7 @@ class Zippy(PayloadType):
                 MythicRPCPayloadUpdateBuildStepMessage(
                     PayloadUUID=self.uuid,
                     StepName="Praise",
-                    StepStdout="Ah-ha - we're done building...does it execute?\n{build_msg}",
+                    StepStdout=f"Ah-ha - we're done building...does it execute?\n{build_msg}",
                     StepSuccess=True,
                 )
             )

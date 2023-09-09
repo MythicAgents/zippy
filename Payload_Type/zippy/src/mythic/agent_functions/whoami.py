@@ -1,6 +1,6 @@
-from mythic_container.MythicCommandBase import *
-
 import json
+
+from mythic_container.MythicCommandBase import *
 
 
 class WhoamiArguments(TaskArguments):
@@ -19,7 +19,7 @@ class WhoamiCommand(CommandBase):
     needs_admin = False
     help_cmd = "whoami"
     description = "Get the username associated with your current thread token."
-    version = 2
+    version = 1
     is_exit = False
     is_file_browse = False
     is_process_list = False

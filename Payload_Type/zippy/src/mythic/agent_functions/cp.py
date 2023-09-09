@@ -1,6 +1,7 @@
+import json
+
 from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
-import json
 
 
 class CpArguments(TaskArguments):
@@ -39,7 +40,7 @@ class CpCommand(CommandBase):
     help_cmd = "cp source destination"
     description = "copy file or folder to destination"
     version = 1
-    author = "@ajpc500"
+    author = "@ArchiMoebius"
     attackmapping = []
     argument_class = CpArguments
     attributes = CommandAttributes(

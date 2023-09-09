@@ -1,5 +1,6 @@
-from mythic_container.MythicCommandBase import *
 import json
+
+from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
 
 
@@ -24,7 +25,7 @@ class GetCwdCommand(CommandBase):
     is_download_file = False
     is_remove_file = False
     is_upload_file = False
-    author = "@ajpc500"
+    author = "@ArchiMoebius"
     argument_class = GetCwdArguments
     attackmapping = []
     attributes = CommandAttributes(

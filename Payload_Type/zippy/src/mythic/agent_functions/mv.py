@@ -1,6 +1,7 @@
+import json
+
 from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
-import json
 
 
 class MvArguments(TaskArguments):
@@ -39,7 +40,7 @@ class MvCommand(CommandBase):
     help_cmd = "mv source destination"
     description = "Move file or folder to destination"
     version = 1
-    author = "@ajpc500"
+    author = "@ArchiMoebius"
     attackmapping = []
     argument_class = MvArguments
     attributes = CommandAttributes(

@@ -1,6 +1,6 @@
+import argparse
 import json
 import shlex
-import argparse
 
 from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *

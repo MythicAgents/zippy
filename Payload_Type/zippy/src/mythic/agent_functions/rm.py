@@ -1,7 +1,7 @@
-from mythic_container.PayloadBuilder import *
-from mythic_container.MythicCommandBase import *
-
 import json
+
+from mythic_container.MythicCommandBase import *
+from mythic_container.PayloadBuilder import *
 
 
 class RmArguments(TaskArguments):

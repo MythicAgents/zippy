@@ -1,7 +1,7 @@
+from sys import exc_info
+
 from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
-
-from sys import exc_info
 
 
 class UploadArguments(TaskArguments):

@@ -1,5 +1,6 @@
-from mythic_container.MythicCommandBase import *
 import json
+
+from mythic_container.MythicCommandBase import *
 
 
 class ExitArguments(TaskArguments):
@@ -17,7 +18,7 @@ class ExitCommand(CommandBase):
     needs_admin = False
     help_cmd = "exit"
     description = "Task the agent to exit"
-    version = 2
+    version = 1
     supported_ui_features = ["callback_table:exit"]
     is_exit = True
     is_file_browse = False

@@ -1,7 +1,8 @@
-from mythic_container.MythicCommandBase import *
 import json
-from mythic_container.MythicRPC import *
 import sys
+
+from mythic_container.MythicCommandBase import *
+from mythic_container.MythicRPC import *
 
 
 class CatArguments(TaskArguments):
@@ -31,7 +32,7 @@ class CatCommand(CommandBase):
     help_cmd = "cat /path/to/file"
     description = "Read and output the contents of a file"
     version = 1
-    author = "@ajpc500"
+    author = "@ArchiMoebius"
     attackmapping = ["T1005"]
     argument_class = CatArguments
     attributes = CommandAttributes(

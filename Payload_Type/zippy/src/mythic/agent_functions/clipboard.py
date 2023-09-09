@@ -1,5 +1,6 @@
-from mythic_container.MythicCommandBase import *
 import json
+
+from mythic_container.MythicCommandBase import *
 
 
 class ClipboardArguments(TaskArguments):
@@ -17,7 +18,7 @@ class ClipboardCommand(CommandBase):
     needs_admin = False
     help_cmd = "clipboard"
     description = "Task the agent to get clipboard contents"
-    version = 2
+    version = 1
     is_file_browse = False
     is_process_list = False
     is_download_file = False
