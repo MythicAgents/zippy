@@ -1,15 +1,5 @@
 extends Node
 
-var transport = null
-var has_sent_checkin = false
-var time = 0
-var time_period = 1
-var do_exit = false
-var exiting = false
-var outbound = []
-var headers
-var connect_attempt
-
 func _unhandled_input(event):
 	if event is InputEventKey:
 		if event.pressed:
@@ -25,7 +15,7 @@ func _ready():
 	get_tree().set_auto_accept_quit(false) # Don't let users click X or alt+F4
 	get_tree().get_root().set_transparent_background(true) # transparent background?
 
-func _on_tasking_exit(transport, task):
+func _on_tasking_exit(_transport, _task):
 	await get_tree().create_timer($".".get_node("transport/CallbackTimer").wait_time*2).timeout
 
 	# inherited by children

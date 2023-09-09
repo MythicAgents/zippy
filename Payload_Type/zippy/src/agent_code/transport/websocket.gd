@@ -40,7 +40,6 @@ func _process(delta):
 	_time += delta
 	# TODO: this is not being called until we add_child in transport...duh...
 	if _time > _heartbeat_period:
-		print("heartbeat time")
 
 		if _client == null:
 			_setup_client()
@@ -64,11 +63,10 @@ func send(payload, skip_queue=false):
 			ret = OK == _client.put_packet(wrap_payload(payload))
 
 			if not ret:
-				print("failed to send data...", payload)
-			else:
-				print("sent payload: ", payload)
+				print_debug("failed to send data...", payload)
+
 		else:
-			print("skipping", payload, "try again once we're connected...")
+			print_debug("skipping", payload, "try again once we're connected...")
 			ret = false
 
 	return ret
@@ -78,13 +76,13 @@ func recv():
 		var packet = _client.get_packet().get_string_from_utf8()
 
 		if not packet.length():
-			print("controlpacket?: ", packet)
+			print_debug("controlpacket?: ", packet)
 			continue
 
 		var result = unwrap_payload(packet)
 
 		if not result.has("action") or result["action"] == "":
-			print("Bad message unpacked? ", result)
+			print_debug("Bad message unpacked? ", result)
 			return
 
 		transport.recv(result.get("action"), result)
@@ -102,48 +100,20 @@ func client_poll():
 		var ret = _client.put_packet(wrap_payload(msg))
 
 		if ret != OK:
-			print("failed to send data...", msg) # TODO: requeue?
+			print_debug("failed to send data...", msg) # TODO: requeue?
 
 	if _client.get_available_packet_count() > 0:
 		recv()
 
-func wrap_payload(payload):
-
-	if config.should_encrypt():
-		pass # TODO: implement encryption
-	else:
-		payload = Marshalls.utf8_to_base64(config.get_uuid() + payload).to_utf8_buffer()
-
-	return payload
+func wrap_payload(payload) -> PackedByteArray:
+	return config.wrap_payload(payload)
 
 func unwrap_payload(packet):
-	var ret = {
-		"action": "",
-		"payload": "",
-		"uuid": "",
-		"status": false
-	}
-
-	var data = Marshalls.base64_to_utf8(packet)
-	
-	ret["uuid"] = data.substr(0, 36)
-
-	# TODO: decryption
-	var test_json_conv = JSON.new()
-	test_json_conv.parse(data.substr(36))
-	ret["payload"] = test_json_conv.get_data()
-
-	if ret["payload"].has("action"):
-		ret["action"] = ret["payload"].get("action")
-
-	if ret["payload"].has("status"):
-		ret["status"] = ret["payload"].get("status") == "success"
-
-	return ret
+	return config.unwrap_payload(packet)
 
 func client_connect():
 
-	if client_is_connected() == 1:
+	if client_is_connected() != -1:
 		# if we're opening or already connected
 		return true
 
@@ -154,7 +124,7 @@ func client_connect():
 	else:
 		connect_attempt -= 1
 
-		print("calling coonnect to: ", config.get_callback_uri())
+		print_debug("calling coonnect to: ", config.get_callback_uri())
 		var err = _client.connect_to_url(config.get_callback_uri(), _client_options)
 
 		if err != OK:
@@ -172,10 +142,10 @@ func client_is_connected():
 	var status = _client.get_ready_state()
 
 	if status == WebSocketPeer.STATE_CLOSED or status == WebSocketPeer.STATE_CLOSING:
-		print("client closed")
+		print_debug("client closed")
 		return -1
 	elif status == WebSocketPeer.STATE_OPEN:
 		return 1
 	else:
-		print("client in unknown state", status)
+		print_debug("client connecting?")
 		return 0

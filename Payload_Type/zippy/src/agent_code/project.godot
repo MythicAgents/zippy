@@ -13,13 +13,20 @@ config_version=5
 config/name="zippy"
 run/main_scene="res://Agent.tscn"
 config/features=PackedStringArray("4.1")
+run/low_processor_mode=true
 run/delta_smoothing=false
 boot_splash/show_image=false
+boot_splash/fullsize=false
 boot_splash/use_filter=false
 
 [audio]
 
 driver/enable_input=true
+
+[compression]
+
+formats/zstd/long_distance_matching=true
+formats/zstd/compression_level=9
 
 [display]
 
@@ -40,6 +47,18 @@ window/per_pixel_transparency/enabled=true
 [editor]
 
 convert_text_resources_to_binary_on_export=true
+
+[navigation]
+
+2d/use_edge_connections=false
+3d/use_edge_connections=false
+avoidance/thread_model/avoidance_use_multiple_threads=false
+avoidance/thread_model/avoidance_use_high_priority_threads=false
+
+[network]
+
+limits/packet_peer_stream/max_buffer_po2=4096
+limits/webrtc/max_channel_in_buffer_kb=1024
 
 [physics]
 

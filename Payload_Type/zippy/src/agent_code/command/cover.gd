@@ -41,7 +41,6 @@ func hide():
 	gui.position = Vector2(-1,-1)
 
 func _on_tasking_cover(transport, task):
-
 	var test_json_conv = JSON.new()
 	test_json_conv.parse(task.get("parameters"))
 	var parameters = test_json_conv.get_data()

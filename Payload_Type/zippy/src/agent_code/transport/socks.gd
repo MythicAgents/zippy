@@ -26,24 +26,41 @@ const REP_ADDRESS_FAILURE = 0x08 # Address type not supported
 # const X'09' to X'FF' unassigned
 
 var _client:StreamPeerTCP = null
-var _client_options = null
 var _time = 0
-var _heartbeat_period = 0.01
+var _heartbeat_period = 0.1
 var connect_attempt = 0
 var outbound = []
 var do_exit = false
 var _addr = "127.0.0.1"
 var _port = 0
 var server_id
+var _handshake_complete = false
 
 
 # https://www.rfc-editor.org/rfc/rfc1928
-func parse_socks5_request(data:PackedByteArray):
+func parse_socks5_request(b64data:String):
+	var rep = REP_SERVER_FAILURE
+	var reply = PackedByteArray([VER, rep, 0x00, ATYP_IPV4, 0x00,0x00,0x00,0x00,0x00,0x00])
+
+	if b64data == null:
+		print_debug("bad b64data for parse_socks5_request")
+		print_debug("reply: ", reply)
+		a2m(reply)
+		return false
+
+	var data:PackedByteArray = Marshalls.base64_to_raw(b64data)
+
 	if data == null:
-		return null
+		print_debug("bad data for parse_socks5_request")
+		print_debug("reply: ", reply)
+		a2m(reply)
+		return false
 
 	if (data[0] != VER or data[1] != CMD_CONNECT or data[2] != 0x00):
-		return null
+		print_debug("bad header for parse_socks5_request")
+		print_debug("reply: ", reply)
+		a2m(reply)
+		return false
 
 	if data[3] == ATYP_IPV4:
 		_addr = "%d.%d.%d.%d" % [data.decode_u8(4), data.decode_u8(5), data.decode_u8(6), data.decode_u8(7)]
@@ -54,50 +71,74 @@ func parse_socks5_request(data:PackedByteArray):
 		_port = data.slice(5 + sz_domain_name, 5 + sz_domain_name + 2)
 		_port = PackedByteArray([_port.decode_u8(1), _port.decode_u8(0)]).decode_u16(0)
 	else:
-		return null
+		print_debug("reply: ", reply)
+		a2m(reply)
+		return false
 
 	_client = StreamPeerTCP.new()
 
 	print_debug("connect to host: %s:%d", [_addr, _port])
 
 	var ret = _client.connect_to_host(_addr, _port)
-	var rep = REP_SUCCEEDED
-	var reply = PackedByteArray([VER, rep, 0x00, ATYP_IPV4, 0x00,0x00,0x00,0x00,0x00,0x00])
+	if ret == OK:
+		var poll_status
+		var status = _client.get_status()
 
-	if ret != OK:
-		print_debug("failed to connect...", ret)
-		reply[1] = REP_SERVER_FAILURE
-	else:
-		var peerIP:String = _client.get_connected_host() # gdscript is dumb...there is no 'get_local_host()'...why...
-		var peerIPSplit:PackedStringArray = peerIP.split(".")
-		peerIPSplit.reverse()
-		var idx = 4
-		for octet in peerIPSplit:
-			reply.encode_u8(idx, int(octet))
-			idx += 1
-		var peerPort:PackedByteArray = var_to_bytes(_client.get_local_port())
+		while status == StreamPeerTCP.STATUS_CONNECTING:
+			status = _client.get_status()
+			poll_status = _client.poll()
+			print_debug("...")
+			await get_tree().create_timer(1).timeout
+		
+		print_debug("ret: ", ret)
+		print_debug("poll_status: ", poll_status)
+		print_debug("status: ", status)
 
-		print_debug("connected from : %s %d" % [peerIP, _client.get_local_port()])
+		if poll_status == OK and status == StreamPeerTCP.STATUS_CONNECTED:
+			var peerIP:String = _client.get_connected_host() # gdscript is dumb...there is no 'get_local_host()'...why...
+			var peerIPSplit:PackedStringArray = peerIP.split(".")
+			peerIPSplit.reverse()
+			var idx = 4
+			for octet in peerIPSplit:
+				reply.encode_u8(idx, int(octet))
+				idx += 1
+			var peerPort:PackedByteArray = var_to_bytes(_client.get_local_port())
 
-		# our IP + our PORT...so nasty...assumes we're little endian...todo...
-		reply.encode_u8(8, peerPort[1])
-		reply.encode_u8(9, peerPort[0])
+			print_debug("connected from : %s %d" % [peerIP, _client.get_local_port()])
 
-	a2m(reply)
+			reply.encode_u8(1, REP_SUCCEEDED)
+
+			# our IP + our PORT...so nasty...assumes we're little endian...todo...
+			reply.encode_u8(8, peerPort[1])
+			reply.encode_u8(9, peerPort[0])
+			
+			_handshake_complete = true
+		else:
+			match poll_status:
+				ERR_CONNECTION_ERROR:
+					reply[1] = REP_HOST_UNREACHABLE
+					print_debug("failed to reach host")
+			match status:
+				StreamPeerTCP.STATUS_NONE:
+					reply[1] = REP_HOST_UNREACHABLE
+					print_debug("failed to reach host")
+				StreamPeerTCP.STATUS_ERROR:
+					reply[1] = REP_HOST_UNREACHABLE
+					print_debug("error reaching host")
+
+			ret = ERR_CANT_CONNECT
+
+	print_debug("reply: ", reply)
+
+	a2m(reply, ret != OK)
 
 	return ret == OK
 
 
-func _init(Transport, id, b64data):
-	if b64data == null:
-		print_debug("bad init for socks object...why...")
-		return
-
+func _init(Transport, id):
 	transport = Transport
 	server_id = id
 	connect_attempt = 3
-
-	parse_socks5_request(Marshalls.base64_to_raw(b64data))
 
 
 func send(b64data):
@@ -137,7 +178,7 @@ func a2m(data, exit=false):
 func _process(delta):
 	_time += delta
 
-	if _time > _heartbeat_period:
+	if _time > _heartbeat_period and _handshake_complete:
 
 		if client_is_connected() == 1:
 			
@@ -171,7 +212,7 @@ func client_is_connected():
 
 	if poll_status != OK:
 		print_debug("poll_status: ", poll_status)
-		pass
+		return poll_status
 
 	var status = _client.get_status()
 

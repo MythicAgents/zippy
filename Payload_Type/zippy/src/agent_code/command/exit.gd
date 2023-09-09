@@ -6,7 +6,7 @@ func _on_tasking_exit(transport, task):
 			true,
 			true,
 			task.get("id"),
-			"Any last words?",
+			"So long, K. Bowser!",
 			[
 				[
 					"Process Destroy",

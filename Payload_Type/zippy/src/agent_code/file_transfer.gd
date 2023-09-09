@@ -27,7 +27,7 @@ var first_chunk_requested = false
 var checkin_done = false
 
 func debug():
-	print("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nTaskID: %s\nFileId: %s\nFilePath: %s\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" % [task_id, file_id, file_path])
+	print_debug("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nTaskID: %s\nFileId: %s\nFilePath: %s\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" % [task_id, file_id, file_path])
 
 func _init(taskId, filePath, fileDirection, Transport, fileId = "", rawData:PackedByteArray=[], isFromScreenshot=false):
 	task_id = taskId
@@ -49,8 +49,6 @@ func _init(taskId, filePath, fileDirection, Transport, fileId = "", rawData:Pack
 	is_screenshot = isFromScreenshot
 
 func process():
-	print("FileTransfer Process: ", file_path, "\n", task_id, "\n===================================================================================\n")
-
 	if direction == DIRECTION.DOWNLOAD or direction == DIRECTION.SCREENSHOT:
 		process_download()
 	
@@ -65,8 +63,6 @@ func process_upload():
 		completed = true
 
 		file_size = 0
-
-		print("\nUpload _process: ", file_path)
 
 		# TODO: bail if we can't read the file and return this status / info
 
@@ -98,7 +94,7 @@ func process_upload():
 func process_upload_chunk(response):
 
 	if response.get("status") and response.get("status") == "error":
-		print("something went wrong...", response.get("error"))
+		print_debug("something went wrong...", response.get("error"))
 		state = STATUS.ERROR
 		completed = true
 	else:
@@ -141,11 +137,6 @@ func process_download():
 		file_size = 0
 		position = 0
 
-		print("\nDownload _process: ", file_path)
-		
-		if is_screenshot:
-			print("\nScreenshot _process monitor: ", file_path)
-
 		if raw_data.size() > 0:
 			file_size = raw_data.size()
 
@@ -173,7 +164,7 @@ func process_download():
 				if file_size % chunk_size > 0:
 					extra = 1
 				chunk_count = int(file_size / chunk_size) + extra
-				user_output = "File size: %d\nFullpath: %s\n" % [file_size, file_path]
+				user_output = "File size: %s\nFullpath: %s\n" % [String.humanize_size(file_size), file_path]
 			else:
 				user_output = "Error zero byte file...\nFile: %s\n" % [file_path]
 
@@ -201,9 +192,9 @@ func process_download():
 		# if we're using a file_handle for data vs. in memory buffers
 		if raw_data.size() <= 0:
 			if not file_handle.is_open():
-				print("_process_download_chunk failed - file_handle for %s is closed..." % file_path)
+				print_debug("_process_download_chunk failed - file_handle for %s is closed..." % file_path)
 				return
-			
+
 			position = file_handle.get_position()
 
 		if position < file_size:

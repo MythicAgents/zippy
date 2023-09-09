@@ -18,6 +18,7 @@ class Zippy(PayloadType):
         SupportedOS.Linux,
         SupportedOS.Windows,
     ]
+    mythic_encrypts = True
     version = "4.1.0"
     wrapper = False
     wrapped_payloads = []
@@ -158,7 +159,7 @@ class Zippy(PayloadType):
                 MythicRPCPayloadUpdateBuildStepMessage(
                     PayloadUUID=self.uuid,
                     StepName="Praise",
-                    StepStdout="Ah ha - we're done...did it work?\n{build_msg}",
+                    StepStdout="Ah-ha - we're done building...does it execute?\n{build_msg}",
                     StepSuccess=True,
                 )
             )

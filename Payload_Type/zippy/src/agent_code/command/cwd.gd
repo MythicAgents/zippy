@@ -1,7 +1,6 @@
 extends Node
 
 func _on_tasking_cwd(transport, task):
-
 	transport.send(
 		transport.create_task_response(
 			true,

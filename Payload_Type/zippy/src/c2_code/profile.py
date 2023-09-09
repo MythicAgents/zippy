@@ -41,13 +41,6 @@ class Websocket(C2Profile):
             required=False,
         ),
         C2ProfileParameter(
-            name="encrypted_exchange_check",
-            description="Perform Key Exchange",
-            choices=["T", "F"],
-            parameter_type=ParameterType.ChooseOne,
-            required=False,
-        ),
-        C2ProfileParameter(
             name="domain_front",
             description="Host header value for domain fronting",
             default_value="",
