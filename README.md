@@ -4,31 +4,20 @@
   <img alt="Zippy Logo" src="documentation-payload/zippy/zippy.svg" height="30%" width="30%">
 </p>
 
-Zippy is an agent that compiles into Linux, (MacOS, and Windows - at some point) executables. It's an "IT training tool" - not ransomware...and is currently a WIP.
+Zippy is an agent that compiles into a Linux or Windows executable. It's an "IT training tool" - not ransomware...
 
-It leverages the [Godot](godotengine.org/) to cross compile for the supported operating systems. This Zippy instance supports Mythic 2.3 and will be updated as necessary. It does not support Mythic 2.2 and lower.
+It leverages the [Godot game engine](https://godotengine.org/) to cross compile for the supported operating systems. This Zippy instance supports Mythic 3.0 and will be updated as necessary. It does not support versions of Mythic lower than 3.0!
 
-The agent has `mythic_payloadtype_container==0.1.8` PyPi package installed and reports to Mythic as version "12".
+## Commands
 
-## Zippy's Icon
+The agent support the following commands: cat, **clipboard**, **cover**, cp, **curl**, cwd, download, exit, kill, ls, mv, **ransom**, record, rm, sleep, **socks**, spawn, upload, and whoami.
 
-zippy's icon made with Gimp
+## How to install
 
-## How to install an agent in this format within Mythic
-
-TODO
-
-When it's time for you to test out your install or for another user to install your agent, it's pretty simple. Within Mythic you can run the `mythic-cli` binary to install this in one of three ways:
-
-* `sudo ./mythic-cli install github https://github.com/ArchiMoebius/zippy` to install the main branch
-* `sudo ./mythic-cli install github https://github.com/ArchiMoebius/zippy main` to install a specific branch of that repo
-* `sudo ./mythic-cli install folder /path/to/local/folder/cloned/from/github` to install from an already cloned down version of an agent repo
-
-Now, you might be wondering _when_ should you or a user do this to properly add your agent to their Mythic instance. There's no wrong answer here, just depends on your preference. The three options are:
-
-* Mythic is already up and going, then you can run the install script and just direct that agent's containers to start (i.e. `sudo ./mythic-cli payload start agentName` and if that agent has its own special C2 containers, you'll need to start them too via `sudo ./mythic-cli c2 start c2profileName`).
-* Mythic is already up and going, but you want to minimize your steps, you can just install the agent and run `sudo ./mythic-cli mythic start`. That script will first _stop_ all of your containers, then start everything back up again. This will also bring in the new agent you just installed.
-* Mythic isn't running, you can install the script and just run `sudo ./mythic-cli mythic start`. 
+Within Mythic you can run the `mythic-cli` binary to install this agent from the main branch:
+```bash
+sudo ./mythic-cli install github https://github.com/MythicAgents/zippy
+```
 
 ## Documentation
 
@@ -38,8 +27,12 @@ interface.
 
 ## Building Outside of Mythic
 
-TODO
+Use the [Godot v4.1 + editor](https://github.com/godotengine/godot/releases/download/4.1.1-stable/Godot_v4.1.1-stable_linux.x86_64.zip) to load the agent_code directory.
 
 ## Developing
 
-TODO
+Use the [Godot v4.1 + editor](https://github.com/godotengine/godot/releases/download/4.1.1-stable/Godot_v4.1.1-stable_linux.x86_64.zip) and have Mythic setup - generate an agent, copy the details into the provided 'config_zippy-websocket.json' file and press F5.
+
+## Zippy's Icon
+
+Zippy's icon was made with Gimp. If you're an artist - feel free to make something snazzier.
