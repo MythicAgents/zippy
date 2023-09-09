@@ -1,11 +1,12 @@
 +++
 title = "kill"
 chapter = false
-weight = 114
+weight = 116
 hidden = false
 +++
 
 ## Summary
+
 Kill a process specified by PID.
 
 - Needs Admin: maybe...
@@ -14,12 +15,13 @@ Kill a process specified by PID.
 
 ### Arguments
 
+pid - the process ID to terminate.
+
 ## Usage
 
 ```
-kill [pid]
+kill pid
 ```
-
 
 ## Detailed Summary
 

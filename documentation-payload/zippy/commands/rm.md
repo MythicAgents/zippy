@@ -1,7 +1,7 @@
 +++
 title = "rm"
 chapter = false
-weight = 122
+weight = 116
 hidden = false
 +++
 
@@ -18,9 +18,8 @@ Delete a file.
 ## Usage
 
 ```
-rm [path/to/a/file/or/a/folder]
+rm path/to/a/file/or/a/folder
 ```
-
 
 ## Detailed Summary
 

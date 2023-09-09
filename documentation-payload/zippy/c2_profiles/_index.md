@@ -7,4 +7,4 @@ pre = "<b>4. </b>"
 
 # Supported C2 Profiles
 
-This section goes into any `zippy` specifics for the supported C2 profiles.
+This section goes into any `zippy` specifics for the supported C2 profiles - which are: zippy-websocket - e.o.m.

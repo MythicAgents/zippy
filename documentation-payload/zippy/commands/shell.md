@@ -1,19 +1,13 @@
 +++
 title = "shell"
 chapter = false
-weight = 125
+weight = 116
 hidden = false
 +++
 
 ## Summary
 
-On Linux and MacOS:
-
-Execute a shell command with 'bash -c'.
-
-On Windows:
-
-TODO...
+On Linux and Windows - execute commands using either `bash` or `cmd.exe`
   
 - Needs Admin: False
 - Version: 1  
@@ -26,7 +20,7 @@ Whatever command you want to execute
 ## Usage
 
 ```
-shell [command]
+shell command arguments
 ```
 
 ## MITRE ATT&CK Mapping

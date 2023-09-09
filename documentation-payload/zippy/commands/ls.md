@@ -6,6 +6,7 @@ hidden = false
 +++
 
 ## Summary
+
 List directory or file
 
 - Needs Admin: maybe...
@@ -25,6 +26,7 @@ ls /home/
 ## MITRE ATT&CK Mapping
 
 - T1083  
+
 ## Detailed Summary
 
 List the contents of a directory

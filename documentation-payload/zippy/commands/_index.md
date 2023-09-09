@@ -6,14 +6,26 @@ pre = "<b>2. </b>"
 +++
 
 Commands:
+    * cat
+    * clipboard
+    * cover
+    * cp
+    * curl
+    * cwd
+    * download
+    * exit
+    * kill
+    * logo
+    * ls
+    * mv
+    * ransom
+    * record
+    * rm
+    * screenshot
+    * shell
+    * sleep
+    * socks
+    * spawn
+    * upload
+    * whoami
 
- * download
- * exit
- * kill
- * ls
- * ps
- * ransom
- * rm
- * shell
- * upload
- * whoami
