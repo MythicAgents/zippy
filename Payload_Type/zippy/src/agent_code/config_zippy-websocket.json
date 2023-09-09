@@ -2,15 +2,15 @@
   "callback_host": "ws://10.10.10.69",
   "USER_AGENT": "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko",
   "AESPSK": {
-	"dec_key": "",
-	"enc_key": "",
-	"value": "none"
+	"dec_key": "powPlAv8comYkgrzHaCx+IpuxQa6mLuXHCJpClR/HqA=",
+	"enc_key": "powPlAv8comYkgrzHaCx+IpuxQa6mLuXHCJpClR/HqA=",
+	"value": "aes256_hmac"
   },
   "callback_interval": "5",
   "domain_front": "",
   "ENDPOINT_REPLACE": "socket",
   "callback_jitter": "3",
   "callback_port": "9001",
-  "payload_uuid": "07027a45-674e-49dd-a697-08b96a3d99db",
+  "payload_uuid": "95f2af30-74de-4a50-aeac-cb0f8cab86db",
   "tls_verify": false
 }
