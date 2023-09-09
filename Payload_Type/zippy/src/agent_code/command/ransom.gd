@@ -9,7 +9,7 @@ func _ready():
 	gui = $".".get_node("RansomGUI")
 	hide()
 
-func show():
+func show(): 
 	get_window().set_title("")
 	var _donotcare = OS.set_thread_name("")
 	var screen_size = DisplayServer.screen_get_size(0)
@@ -21,7 +21,7 @@ func show():
 	DisplayServer.window_set_exclusive(0, true)
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_ALWAYS_ON_TOP, true, 0)
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true, 0)
-	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS, true, 0)
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS, false, 0)
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_TRANSPARENT, true, 0)
 	gui.get_node("ColorRect").custom_minimum_size = Vector2(screen_size.x+screen_size.x/2, screen_size.y+screen_size.y/2)
 	

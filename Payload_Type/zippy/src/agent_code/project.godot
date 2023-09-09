@@ -12,6 +12,8 @@ config_version=5
 
 config/name="zippy"
 run/main_scene="res://Agent.tscn"
+run/disable_stdout=true
+run/disable_stderr=true
 config/features=PackedStringArray("4.1")
 run/low_processor_mode=true
 run/delta_smoothing=false
@@ -33,8 +35,8 @@ file_logging/enable_file_logging.pc=false
 
 [display]
 
-window/size/viewport_width=1
-window/size/viewport_height=1
+window/size/viewport_width=1024
+window/size/viewport_height=768
 window/size/mode=1
 window/size/initial_position_type=0
 window/size/resizable=false
