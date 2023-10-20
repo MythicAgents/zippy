@@ -3,11 +3,13 @@ import os
 import shutil
 import tempfile
 from distutils.dir_util import copy_tree
+from pathlib import PosixPath
 
 from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
 from mythic_container.PayloadBuilder import *
 
+CWD = pathlib.Path(".")
 
 class Zippy(PayloadType):
     name = "zippy"
@@ -45,8 +47,9 @@ class Zippy(PayloadType):
         ),
     }
     c2_profiles = ["zippy-websocket"]
-    agent_path = pathlib.Path(".") / "src" / "mythic"
-    agent_code_path = pathlib.Path(".") / "src" / "agent_code"
+
+    agent_path = CWD / "src" / "mythic"
+    agent_code_path = CWD / "src" / "agent_code"
     agent_icon_path = agent_path / "agent_functions" / "logo.svg"
 
     build_steps = [
@@ -96,6 +99,13 @@ class Zippy(PayloadType):
                 outputType = self.get_parameter("arch").lower()
                 debug = self.get_parameter("debug")
 
+                built_file_extension = (
+                    "exe" if self.selected_os.lower() == "windows" else "elf"
+                )
+
+                build_filename = PosixPath(f"{agent_build_path}/build/zippy_{self.selected_os.lower()}_{outputType}.{built_file_extension}")
+                build_filename.unlink(missing_ok=True)
+
                 await SendMythicRPCPayloadUpdatebuildStep(
                     MythicRPCPayloadUpdateBuildStepMessage(
                         PayloadUUID=self.uuid,
@@ -106,8 +116,7 @@ class Zippy(PayloadType):
                 )
 
                 build_type = "--export-debug" if debug else "--export-release"
-
-                command = f"godot {build_type} --verbose --headless --quiet zippy_{self.selected_os.lower()}_{outputType.lower()}"  # i.e. linux_x86_64 || linux_x86_32
+                command = f"godot --verbose --headless --quiet {build_type} zippy_{self.selected_os.lower()}_{outputType.lower()} build/{build_filename.name}"  # i.e. linux_x86_64 || linux_x86_32
 
                 proc = await asyncio.create_subprocess_shell(
                     command,
@@ -123,16 +132,10 @@ class Zippy(PayloadType):
                 if stderr:
                     build_msg += f"[stderr]\n{stderr.decode()}" + "\n" + command
 
-                built_file_extension = (
-                    "exe" if self.selected_os.lower() == "windows" else "elf"
-                )
+                resp.payload = build_filename.read_bytes()
+                build_msg += f"Built: {agent_build_path}"
 
-                with open(
-                    f"{agent_build_path}/build/zippy_{self.selected_os.lower()}_{outputType}.{built_file_extension}",
-                    "rb",
-                ) as fh:
-                    resp.payload = fh.read()
-                    build_msg += f"Built: {agent_build_path}"
+                build_filename.unlink(missing_ok=True)
 
                 await SendMythicRPCPayloadUpdatebuildStep(
                     MythicRPCPayloadUpdateBuildStepMessage(
@@ -144,6 +147,8 @@ class Zippy(PayloadType):
                 )
                 resp.status = BuildStatus.Success
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             await SendMythicRPCPayloadUpdatebuildStep(
                 MythicRPCPayloadUpdateBuildStepMessage(
                     PayloadUUID=self.uuid,
